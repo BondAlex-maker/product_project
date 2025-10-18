@@ -1,35 +1,36 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import {Routes, Route, Link, BrowserRouter} from "react-router-dom";
+import TutorialsList from "./pages/TutorialsList";
+import AddTutorial from "./pages/AddTutorial";
+import Tutorial from "./pages/Tutorial";
 
 function App() {
-  const [count, setCount] = useState(0)
+    return (
+        <BrowserRouter>
+            <div>
+                {/* NAVBAR */}
+                <nav className="bg-blue-600 p-4 text-white">
+                    <div className="flex space-x-4">
+                        <Link to="/tutorials" className="hover:text-gray-300 font-bold">
+                            Tutorials
+                        </Link>
+                        <Link to="/add" className="hover:text-gray-300">
+                            Add
+                        </Link>
+                    </div>
+                </nav>
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+                {/* ROUTES */}
+                <div className="container mx-auto mt-8 px-4">
+                    <Routes>
+                        <Route path="/" element={<TutorialsList />} />
+                        <Route path="/tutorials" element={<TutorialsList />} />
+                        <Route path="/add" element={<AddTutorial />} />
+                        <Route path="/tutorials/:id" element={<Tutorial />} />
+                    </Routes>
+                </div>
+            </div>
+        </BrowserRouter>
+    );
 }
 
-export default App
+export default App;
