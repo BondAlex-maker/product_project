@@ -1,5 +1,5 @@
 export default (sequelize, Sequelize) => {
-    const Tutorial = sequelize.define("tutorial", {
+    return sequelize.define("tutorial", {
         title: {
             type: Sequelize.STRING,
         },
@@ -10,5 +10,4 @@ export default (sequelize, Sequelize) => {
             type: Sequelize.BOOLEAN,
         },
     });
-    return Tutorial;
 };
