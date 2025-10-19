@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import TutorialService from "../services/tutorial.service";
 import { Link } from "react-router-dom";
 
@@ -8,17 +9,23 @@ function TutorialsList() {
         totalPages: 0,
         currentPage: 0,
     });
-    const [page, setPage] = useState(0);
-    const [limit, setLimit] = useState(5);
+
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [page, setPage] = useState(Number(searchParams.get("page")) || 0);
+    const [limit, setLimit] = useState(Number(searchParams.get("limit")) || 5);
 
     const [currentTutorial, setCurrentTutorial] = useState(null);
     const [currentIndex, setCurrentIndex] = useState(-1);
-    const [searchTitle, setSearchTitle] = useState("");
-    const [title, setTitle] = useState("");
+    const [searchTitle, setSearchTitle] = useState(searchParams.get("title") || "");
+    const [title, setTitle] = useState(searchParams.get("title") || "");
 
     useEffect(() => {
+        const params = { page, limit };
+        if (title) params.title = title;
+        setSearchParams(params);
         retrieveTutorials(page, limit, title).catch(console.error);
-    }, [page, limit, title]);
+    }, [page, limit, title, setSearchParams]);
+
 
     const onChangeSearchTitle = (e) => {
         setSearchTitle(e.target.value);
