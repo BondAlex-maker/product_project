@@ -3,6 +3,21 @@ import db from "../models/index.js";
 const Op = db.Sequelize.Op;
 const Tutorial = db.tutorials;
 
+const getPagination = (page, size) => {
+    const limit = size ? +size : 5;
+    const offset = page ? page * limit : 0;
+
+    return { limit, offset };
+};
+
+const getPagingData = (data, page, limit) => {
+    const { count: totalItems, rows: tutorials } = data;
+    const currentPage = page ? +page : 0;
+    const totalPages = Math.ceil(totalItems / limit);
+
+    return { totalItems, tutorials, totalPages, currentPage };
+};
+
 // Create and Save a new Tutorial
 export const create = async (req, res) => {
     if (!req.body.title) {
@@ -25,12 +40,14 @@ export const create = async (req, res) => {
 
 // Retrieve all Tutorials
 export const findAll = async (req, res) => {
-    const title = req.query.title;
-    const condition = title ? { title: { [Op.like]: `%${title}%` } } : null;
+    const { page, size, title } = req.query;
+    const condition = title ? { title: { [Op.iLike]: `%${title}%` } } : null;
+    const { limit, offset } = getPagination(page, size);
 
     try {
-        const data = await Tutorial.findAll({ where: condition });
-        res.send(data);
+        const data = await Tutorial.findAndCountAll({ where: condition, limit, offset });
+        const response = getPagingData(data, page, limit);
+        res.send(response);
     } catch (err) {
         res.status(500).send({ message: err.message || "Some error occurred while retrieving tutorials." });
     }
@@ -87,9 +104,13 @@ export const deleteAll = async (req, res) => {
 
 // Find all published Tutorials
 export const findAllPublished = async (req, res) => {
+    const { page, size, title } = req.query;
+    const condition = { published: true };
+    const { limit, offset } = getPagination(page, size);
     try {
-        const data = await Tutorial.findAll({ where: { published: true } });
-        res.send(data);
+        const data = await Tutorial.findAndCountAll({ where: condition, limit, offset });
+        const response = getPagingData(data, page, limit);
+        res.send(response);
     } catch (err) {
         res.status(500).send({ message: err.message || "Some error occurred while retrieving tutorials." });
     }

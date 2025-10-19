@@ -7,8 +7,8 @@ const http = axios.create({
     },
 });
 
-const getAll = () => {
-    return http.get("/tutorials");
+const getAll = (pageNumber, pageSize, searchTitle) => {
+    return http.get(`/tutorials?page=${pageNumber}&size=${pageSize}&title=${searchTitle}`);
 };
 
 const get = (id) => {
