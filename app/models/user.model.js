@@ -1,13 +1,21 @@
 export default (sequelize, Sequelize) => {
-    return sequelize.define("users", {
+    const User = sequelize.define("users", {
         username: {
-            type: Sequelize.STRING
+            type: Sequelize.STRING,
         },
         email: {
-            type: Sequelize.STRING
+            type: Sequelize.STRING,
         },
         password: {
-            type: Sequelize.STRING
-        }
+            type: Sequelize.STRING,
+        },
     });
+
+    User.associate = (models) => {
+        User.hasMany(models.refreshToken, {
+            foreignKey: "userId",
+        });
+    };
+
+    return User;
 };

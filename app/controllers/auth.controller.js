@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 
 const User = db.user;
 const Role = db.role;
+const RefreshToken = db.refreshToken;
 const Op = db.Sequelize.Op;
 
 export const signup = async (req, res) => {
@@ -67,9 +68,12 @@ export const signin = async (req, res) => {
             {
                 algorithm: "HS256",
                 allowInsecureKeySizes: true,
-                expiresIn: 86400 // 24 hours
+                // expiresIn: 86400 // 24 hours
+                expiresIn: config.jwtExpiration // 1 hours
             }
         );
+
+        let refreshToken = await RefreshToken.createToken(user);
 
         // Get roles
         const roles = await user.getRoles();
@@ -80,9 +84,49 @@ export const signin = async (req, res) => {
             username: user.username,
             email: user.email,
             roles: authorities,
-            accessToken: token
+            accessToken: token,
+            refreshToken: refreshToken,
         });
     } catch (err) {
         res.status(500).send({ message: err.message });
+    }
+};
+
+export const refreshToken = async (req, res) => {
+    const { refreshToken: requestToken } = req.body;
+
+    if (!requestToken) {
+        return res.status(403).json({ message: "Refresh Token is required!" });
+    }
+
+    try {
+        const refreshToken = await RefreshToken.findOne({ where: { token: requestToken } });
+
+        if (!refreshToken) {
+            return res.status(403).json({ message: "Refresh token is not in database!" });
+        }
+
+        if (RefreshToken.verifyExpiration(refreshToken)) {
+            await RefreshToken.destroy({ where: { id: refreshToken.id } });
+
+            return res.status(403).json({
+                message: "Refresh token was expired. Please make a new signin request",
+            });
+        }
+
+        const user = await refreshToken.getUser();
+
+        // Генерируем новый access token
+        const newAccessToken = jwt.sign({ id: user.id }, config.secret, {
+            expiresIn: config.jwtExpiration,
+        });
+
+        return res.status(200).json({
+            accessToken: newAccessToken,
+            refreshToken: refreshToken.token,
+        });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: err.message || err });
     }
 };

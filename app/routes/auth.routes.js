@@ -23,4 +23,6 @@ export default function (app) {
 
     // Signin route
     app.post("/api/auth/signin", controller.signin);
+
+    app.post("/api/auth/refreshtoken", controller.refreshToken);
 }
