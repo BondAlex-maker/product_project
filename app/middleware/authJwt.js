@@ -6,13 +6,13 @@ const User = db.user;
 const { TokenExpiredError } = jwt;
 
 
-const catchError = (err, res) => {
-    if (err instanceof TokenExpiredError) {
-        return res.status(401).send({ message: "Unauthorized! Access Token was expired!" });
-    }
-
-    return res.sendStatus(401).send({ message: "Unauthorized!" });
-}
+// const catchError = (err, res) => {
+//     if (err instanceof TokenExpiredError) {
+//         return res.status(401).send({ message: "Unauthorized! Access Token was expired!" });
+//     }
+//
+//     return res.sendStatus(401).send({ message: "Unauthorized!" });
+// }
 // helper to make jwt.verify work with await
 const verifyTokenAsync = (token, secret) =>
     new Promise((resolve, reject) => {
