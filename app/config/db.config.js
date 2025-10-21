@@ -1,5 +1,5 @@
 export default {
-    HOST: "localhost",
+    HOST: "127.0.0.1",
     USER: "kigabit",
     PASSWORD: "root123321",
     DB: "mvp_database",
