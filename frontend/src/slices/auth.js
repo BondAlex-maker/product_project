@@ -49,6 +49,27 @@ export const logout = createAsyncThunk("auth/logout", async () => {
     await AuthService.logout();
 });
 
+export const refreshToken = createAsyncThunk(
+    "auth/refreshToken",
+    async (_, thunkAPI) => {
+        try {
+            const data = await AuthService.refreshToken();
+            return {
+                accessToken: data.accessToken,
+                refreshToken: data.refreshToken,
+            };
+        } catch (error) {
+            const message =
+                (error.response && error.response.data?.message) ||
+                error.message ||
+                error.toString();
+            thunkAPI.dispatch(setMessage(message));
+            return thunkAPI.rejectWithValue();
+        }
+    }
+);
+
+
 // Initial state
 const initialState = user
     ? { isLoggedIn: true, user }
@@ -77,6 +98,12 @@ const authSlice = createSlice({
             .addCase(logout.fulfilled, (state, action) => {
                 state.isLoggedIn = false;
                 state.user = null;
+            })
+            .addCase(refreshToken.fulfilled, (state, action) => {
+                if (state.user) {
+                    state.user.accessToken = action.payload.accessToken;
+                    state.user.refreshToken = action.payload.refreshToken;
+                }
             });
     },
 });

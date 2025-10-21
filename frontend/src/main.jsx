@@ -4,8 +4,8 @@ import './index.css'
 import App from './App.jsx'
 import { store } from './store';
 import { Provider } from 'react-redux';
-import { Formik, Field, Form, ErrorMessage } from "formik";
-import * as Yup from "yup";
+import setupInterceptors from "./services/setupInterceptors";
+setupInterceptors(store);
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

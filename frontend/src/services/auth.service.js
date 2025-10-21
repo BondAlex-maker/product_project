@@ -1,44 +1,45 @@
-import axios from "axios";
+import api from "./api";
+import TokenService from "./token.service";
 
-const API_URL = "http://localhost:8080/api/auth/";
-
-const register = async (username, email, password) => {
-    const response = await axios.post(API_URL + "signup", {
-        username,
-        email,
-        password,
-    });
-    return response.data;
-};
-
-const login = async (username, password) => {
-    const response = await axios.post(API_URL + "signin", {
-        username,
-        password,
-    });
-
-    if (response.data.username) {
-        localStorage.setItem("user", JSON.stringify(response.data));
+class AuthService {
+    async register(username, email, password) {
+        const response = await api.post("/auth/signup", { username, email, password });
+        return response.data;
     }
 
-    return response.data;
-};
+    async login(username, password) {
+        const response = await api.post("/auth/signin", { username, password });
 
-const logout = async () => {
-    localStorage.removeItem("user");
-    const response = await axios.post(API_URL + "signout");
-    return response.data;
-};
+        if (response.data.accessToken) {
+            TokenService.setUser(response.data); // сохраняем user + токены
+        }
 
-const getCurrentUser = () => {
-    return JSON.parse(localStorage.getItem("user"));
-};
+        return response.data;
+    }
 
-const AuthService = {
-    register,
-    login,
-    logout,
-    getCurrentUser,
-};
+    async refreshToken() {
+        const refreshToken = TokenService.getLocalRefreshToken();
+        if (!refreshToken) return;
 
-export default AuthService;
+        const response = await api.post("/auth/refreshtoken", { refreshToken });
+
+        if (response.data.accessToken) {
+            TokenService.updateLocalAccessToken(response.data.accessToken);
+            TokenService.updateLocalRefreshToken(response.data.refreshToken);
+        }
+
+        return response.data;
+    }
+
+    async logout() {
+        TokenService.removeUser();
+        const response = await api.post("/auth/signout");
+        return response.data;
+    }
+
+    getCurrentUser() {
+        return TokenService.getUser();
+    }
+}
+
+export default new AuthService();
