@@ -31,8 +31,8 @@ export const signup = async (req, res) => {
             });
             await user.setRoles(roles);
         } else {
-            // default role = 2 admin
-            await user.setRoles([2]);
+            // default role = 3 admin
+            await user.setRoles([3]);
         }
 
         res.send({ message: "User was registered successfully!" });

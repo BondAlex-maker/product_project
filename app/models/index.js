@@ -1,9 +1,9 @@
 import dbConfig from "../config/db.config.js";
 import Sequelize from "sequelize";
-import Tutorial from "./product.model.js";
 import User from "./user.model.js";
 import RefreshToken from "./refreshToken.model.js";
 import Role from "./role.model.js";
+import Product from "./product.model.js";
 
 const sequelize = new Sequelize(
     dbConfig.DB,
@@ -18,7 +18,7 @@ const sequelize = new Sequelize(
 const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
-db.tutorials = Tutorial(sequelize, Sequelize);
+db.products = Product(sequelize, Sequelize);
 db.user = User(sequelize, Sequelize);
 db.refreshToken = RefreshToken(sequelize, Sequelize);
 db.role = Role(sequelize, Sequelize);

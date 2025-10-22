@@ -1,6 +1,6 @@
 import { authJwt } from "../middleware/index.js";
 import * as products from "../controllers/product.controller.js";
-
+import { upload } from "../middleware/imageUpload.js";
 export default function (app) {
     // Set CORS headers for all requests to these routes
     app.use((req, res, next) => {
@@ -14,7 +14,7 @@ export default function (app) {
     // Create a new Product
     app.post(
         "/api/products",
-        [authJwt.verifyToken, authJwt.isAdmin],
+        [authJwt.verifyToken, authJwt.isAdmin, upload.single("image")],
         products.create
     );
 

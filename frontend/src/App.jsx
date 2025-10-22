@@ -1,9 +1,8 @@
 import {Routes, Route, Link, BrowserRouter} from "react-router-dom";
 import { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import TutorialsList from "./pages/TutorialsList";
-import AddTutorial from "./pages/AddTutorial";
-import Tutorial from "./pages/Tutorial";
+import ProductsList from "./pages/ProductsList.jsx";
+import Product from "./pages/Product.jsx";
 import Login from "./components/Login.jsx";
 import Register from "./components/Register.jsx";
 import Home from "./components/Home.jsx";
@@ -13,6 +12,7 @@ import BoardModerator from "./components/BoardModerator.jsx";
 import BoardAdmin from "./components/BoardAdmin.jsx";
 
 import { logout } from "./slices/auth";
+
 
 function App() {
     const [showModeratorBoard, setShowModeratorBoard] = useState(false);
@@ -103,10 +103,10 @@ function App() {
                                 </li>
                             </div>
                         )}
-                        <Link to="/tutorials" className="hover:text-gray-300 font-bold">
+                        <Link to="/products" className="hover:text-gray-300 font-bold">
                             Tutorials
                         </Link>
-                        <Link to="/add" className="hover:text-gray-300">
+                        <Link to="/products/0" className="hover:text-gray-300">
                             Add
                         </Link>
                     </div>
@@ -124,9 +124,8 @@ function App() {
                         <Route path="/mod" element={<BoardModerator />} />
                         <Route path="/admin" element={<BoardAdmin />} />
                         {/*<Route path="/" element={<TutorialsList />} />*/}
-                        <Route path="/tutorials" element={<TutorialsList />} />
-                        <Route path="/add" element={<AddTutorial />} />
-                        <Route path="/tutorials/:id" element={<Tutorial />} />
+                        <Route path="/products" element={<ProductsList />} />
+                        <Route path="/products/:id" element={<Product />} />
                     </Routes>
                 </div>
             </div>

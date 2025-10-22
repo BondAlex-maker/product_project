@@ -25,11 +25,11 @@ export const create = async (req, res) => {
     const product = {
         name: req.body.name,
         description: req.body.description,
-        image: req.body.image,
         ingredients: req.body.ingredients,
         type: req.body.type || "common",
-        price: req.body.price,
-        sale_price: req.body.sale_price,
+        price: parseFloat(req.body.price),
+        sale_price: parseFloat(req.body.sale_price),
+        image: req.file ? `uploads/products/${req.file.filename}` : null,
     };
 
     try {
