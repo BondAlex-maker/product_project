@@ -3,7 +3,7 @@ import cors from 'cors';
 import { createServer as createViteServer } from 'vite';
 import path from 'path';
 import db from './app/models/index.js';
-import tutorialRoutes from './app/routes/tutorial.routes.js';
+import tutorialRoutes from './app/routes/product.routes.js';
 import authRoutes from './app/routes/auth.routes.js';
 import userRoutes from './app/routes/user.routes.js';
 

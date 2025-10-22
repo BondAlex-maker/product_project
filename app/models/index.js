@@ -1,6 +1,6 @@
 import dbConfig from "../config/db.config.js";
 import Sequelize from "sequelize";
-import Tutorial from "./tutorial.model.js";
+import Tutorial from "./product.model.js";
 import User from "./user.model.js";
 import RefreshToken from "./refreshToken.model.js";
 import Role from "./role.model.js";
