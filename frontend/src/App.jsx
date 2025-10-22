@@ -59,12 +59,24 @@ function App() {
                             )}
 
                             {showAdminBoard && (
-                                <li className="nav-item">
-                                    <Link to={"/admin"} className="nav-link">
-                                        Admin Board
-                                    </Link>
-                                </li>
-                            )}
+                                <>
+                                    <li className="nav-item">
+                                        <Link to={"/admin"} className="nav-link">
+                                            Admin Board
+                                        </Link>
+                                    </li>
+                                    <li className="nav-item">
+                                        <Link to="/products" className="hover:text-gray-300 font-bold">
+                                        Tutorials
+                                        </Link>
+                                    </li>
+                                    <li className="nav-item">
+                                        <Link to="/products/0" className="hover:text-gray-300">
+                                        Add
+                                        </Link>
+                                    </li>
+                                </>
+                                )}
 
                             {currentUser && (
                                 <li className="nav-item">
@@ -103,12 +115,6 @@ function App() {
                                 </li>
                             </div>
                         )}
-                        <Link to="/products" className="hover:text-gray-300 font-bold">
-                            Tutorials
-                        </Link>
-                        <Link to="/products/0" className="hover:text-gray-300">
-                            Add
-                        </Link>
                     </div>
                 </nav>
 
