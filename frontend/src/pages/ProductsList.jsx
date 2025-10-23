@@ -79,6 +79,9 @@ function ProductsList() {
                                 <p className="text-gray-600 text-sm flex-1">
                                     {product.description || "No description"}
                                 </p>
+                                <p className="text-gray-600 text-sm flex-1">
+                                    {product.ingredients || "No description"}
+                                </p>
                                 <p className="font-bold mt-2">
                                     ${product.sale_price || product.price}
                                 </p>
