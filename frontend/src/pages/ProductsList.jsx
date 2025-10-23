@@ -1,196 +1,125 @@
-import { useState, useEffect } from "react";
-import { useSearchParams, Link } from "react-router-dom";
-import ProductService from "../services/product.service";
-import {BACKEND_URL} from "../helpers/backendURL.js"
-import {useSelector} from "react-redux";
+import { useEffect, useState } from "react";
+import { useSearchParams, Link, useLocation } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import {
+    fetchCommonProducts,
+    fetchAlcoholProducts,
+} from "../slices/productSlice";
+import { BACKEND_URL } from "../helpers/backendURL.js";
 
 function ProductsList() {
-    const [products, setProducts] = useState({
-        products: [],
-        totalPages: 0,
-        currentPage: 0,
-    });
+    const location = useLocation();
+    const dispatch = useDispatch();
+
+    const { user: currentUser } = useSelector((state) => state.auth);
+    const { list: products, totalPages, currentPage, loading } = useSelector(
+        (state) => state.products
+    );
 
     const [searchParams, setSearchParams] = useSearchParams();
     const [page, setPage] = useState(Number(searchParams.get("page")) || 0);
     const [limit, setLimit] = useState(Number(searchParams.get("limit")) || 6);
-
-    const { user: currentUser } = useSelector((state) => state.auth);
-    const [currentProduct, setCurrentProduct] = useState(null);
-    const [currentIndex, setCurrentIndex] = useState(-1);
-    const [searchName, setSearchName] = useState(searchParams.get("name") || "");
     const [name, setName] = useState(searchParams.get("name") || "");
 
     useEffect(() => {
-        const params = { page, limit };
-        if (name) params.name = name;
-        setSearchParams(params);
-        retrieveProducts(page, limit, name).catch(console.error);
-    }, [page, limit, name, setSearchParams]);
-
-    const onChangeSearchName = (e) => setSearchName(e.target.value);
-
-    const handleLimitChange = (e) => {
-        setLimit(Number(e.target.value));
-        setPage(0);
-    };
-
-    const retrieveProducts = async (pageNumber, pageSize, searchNameParam) => {
-        let response;
-
+        const params = { page, limit, name };
         if (location.pathname.includes("/products/alcohol")) {
-            response = await ProductService.getAllAlcohol(pageNumber, pageSize, searchNameParam);
+            dispatch(fetchAlcoholProducts(params));
         } else {
-            response = await ProductService.getAllCommon(pageNumber, pageSize, searchNameParam);
+            dispatch(fetchCommonProducts(params));
         }
-        // const response = await ProductService.getAll(pageNumber, pageSize, searchNameParam);
-        setProducts(response.data);
-    };
-
-    const refreshList = () => {
-        retrieveProducts(page, limit, name).catch(console.error);
-        setCurrentProduct(null);
-        setCurrentIndex(-1);
-    };
-
-    const setActiveProduct = (product, index) => {
-        setCurrentProduct(product);
-        setCurrentIndex(index);
-    };
-
-    const findByName = async () => {
-        try {
-            const response = await ProductService.findByName(searchName);
-            setProducts(response.data);
-            setName(searchName);
-            setCurrentProduct(null);
-            setCurrentIndex(-1);
-        } catch (e) {
-            console.error(e);
-        }
-    };
-
-    const handlePageChange = (newPage) => {
-        if (newPage >= 0 && newPage < products.totalPages) setPage(newPage);
-    };
+    }, [dispatch, location.pathname, page, limit, name]);
 
     return (
-        <div className="p-4">
-            {/* Search and limit */}
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-4">
-                <form
-                    className="flex w-full md:w-auto gap-2"
-                    onSubmit={(e) => {
-                        e.preventDefault();
-                        findByName().catch(console.error);
-                        setPage(0);
-                    }}
-                >
-                    <input
-                        type="text"
-                        placeholder="Search by name"
-                        value={searchName}
-                        onChange={onChangeSearchName}
-                        className="border border-gray-300 rounded-l px-2 py-1 w-full md:w-64"
-                    />
-                    <button
-                        type="submit"
-                        className="bg-blue-500 text-white px-4 py-1 rounded-r"
-                    >
-                        Search
-                    </button>
-                </form>
+        <div className="p-6 bg-gray-50 min-h-screen">
+            <div className="max-w-6xl mx-auto">
+                <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-2xl font-bold">
+                        {location.pathname.includes("/alcohol")
+                            ? "Alcohol Products"
+                            : "Common Products"}
+                    </h2>
 
-                <div className="flex items-center gap-2">
-                    <label htmlFor="limit-select">Products per page:</label>
-                    <select
-                        id="limit-select"
-                        value={limit}
-                        onChange={handleLimitChange}
-                        className="border border-gray-300 rounded px-2 py-1"
-                    >
-                        <option value={6}>6</option>
-                        <option value={12}>12</option>
-                        <option value={18}>18</option>
-                    </select>
-                </div>
-            </div>
-
-            {/* Products cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {products.products &&
-                    products.products.map((product, index) => (
-                        <div
-                            key={product.id}
-                            className={`border rounded shadow hover:shadow-lg cursor-pointer p-4 flex flex-col ${
-                                index === currentIndex ? "bg-blue-50" : "bg-white"
-                            }`}
-                            onClick={() => setActiveProduct(product, index)}
+                    <div className="flex items-center space-x-2">
+                        <input
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            placeholder="Search..."
+                            className="border rounded px-3 py-2"
+                        />
+                        <button
+                            onClick={() => setSearchParams({ name, page: 0 })}
+                            className="bg-blue-500 text-white px-3 py-2 rounded"
                         >
-                            {product.image && (
-                                <img
-                                    src={BACKEND_URL + '/' + product.image}
-                                    alt={product.name}
-                                    className="w-full h-40 object-cover rounded mb-2"
-                                />
-                            )}
-                            <h3 className="font-bold text-lg mb-1">{product.name}</h3>
-                            {product.ingredients && (
-                                <p className="text-gray-700 text-sm">{product.ingredients}</p>
-                            )}
-                            {product.description && (
-                                <p className="text-gray-700 text-sm">{product.description}</p>
-                            )}
-                            <p className="mt-auto font-semibold">
-                                ${product.price}
-                                {product.sale_price && (
-                                    <span className="line-through text-gray-400 ml-2">
-                                        ${product.sale_price}
-                                    </span>
+                            Search
+                        </button>
+                    </div>
+                </div>
+
+                {loading && <p className="text-center text-gray-500">Loading...</p>}
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {products.length > 0 ? (
+                        products.map((product) => (
+                            <div
+                                key={product.id}
+                                className="bg-white border rounded-xl shadow hover:shadow-md transition p-4 flex flex-col"
+                            >
+                                {product.image && (
+                                    <img
+                                        src={`${BACKEND_URL}/${product.image}`}
+                                        alt={product.name}
+                                        className="w-full h-48 object-cover rounded-md mb-3"
+                                    />
                                 )}
+                                <h3 className="font-semibold text-lg truncate">
+                                    {product.name}
+                                </h3>
+                                <p className="text-gray-600 text-sm flex-1">
+                                    {product.description || "No description"}
+                                </p>
+                                <p className="font-bold mt-2">
+                                    ${product.sale_price || product.price}
+                                </p>
+
+                                {currentUser?.roles?.includes("ROLE_ADMIN") && (
+                                    <Link
+                                        to={`/products/edit/${product.id}`}
+                                        className="mt-3 text-center bg-yellow-400 hover:bg-yellow-500 text-black font-medium px-3 py-2 rounded transition"
+                                    >
+                                        Edit
+                                    </Link>
+                                )}
+                            </div>
+                        ))
+                    ) : (
+                        !loading && (
+                            <p className="text-gray-500 text-center col-span-full">
+                                No products found.
                             </p>
+                        )
+                    )}
+                </div>
 
-                            {currentUser?.roles?.includes("ROLE_ADMIN") && (
-                                <Link
-                                    to={`/products/edit/${product.id}`}
-                                    className="bg-yellow-400 text-black px-3 py-1 rounded inline-block text-center hover:bg-yellow-500"
-                                >
-                                    Edit
-                                </Link>
-                            )}
-                        </div>
-                    ))}
-            </div>
-
-            {/* Pagination */}
-            <div className="flex justify-center items-center gap-2 mt-6 flex-wrap">
-                <button
-                    onClick={() => handlePageChange(page - 1)}
-                    disabled={page === 0}
-                    className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-                >
-                    ← Prev
-                </button>
-
-                {Array.from({ length: products.totalPages }, (_, i) => (
-                    <button
-                        key={i}
-                        onClick={() => handlePageChange(i)}
-                        className={`px-3 py-1 rounded ${
-                            page === i ? "bg-blue-500 text-white" : "bg-gray-200"
-                        }`}
-                    >
-                        {i + 1}
-                    </button>
-                ))}
-
-                <button
-                    onClick={() => handlePageChange(page + 1)}
-                    disabled={page === products.totalPages - 1}
-                    className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-                >
-                    Next →
-                </button>
+                {/* Pagination */}
+                {totalPages > 1 && (
+                    <div className="flex justify-center mt-8 space-x-2">
+                        {Array.from({ length: totalPages }).map((_, i) => (
+                            <button
+                                key={i}
+                                onClick={() => setPage(i)}
+                                className={`px-3 py-1 rounded ${
+                                    i === currentPage
+                                        ? "bg-blue-600 text-white"
+                                        : "bg-gray-200 hover:bg-gray-300"
+                                }`}
+                            >
+                                {i + 1}
+                            </button>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );

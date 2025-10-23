@@ -87,7 +87,7 @@ function App() {
                             </li>
                             {showAdminBoard && (
                                 <li className="nav-item">
-                                    <Link to="/products/0" className="hover:text-gray-300">
+                                    <Link to="/products/edit/0" className="hover:text-gray-300">
                                         Add
                                     </Link>
                                 </li>

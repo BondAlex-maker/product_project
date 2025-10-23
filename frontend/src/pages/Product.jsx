@@ -1,215 +1,207 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import ProductService from "../services/product.service";
-import {BACKEND_URL} from "../helpers/backendURL.js"
+import { useDispatch, useSelector } from "react-redux";
+import {
+    fetchProductById,
+    createProduct,
+    updateProduct,
+    deleteProduct,
+    clearMessage,
+} from "../slices/productSlice";
+import { BACKEND_URL } from "../helpers/backendURL";
 
 function ProductEdit() {
-    const { id } = useParams(); // id может быть "0" для нового продукта
+    const { id } = useParams();
+    const isNew = id === "0";
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
-    const [currentProduct, setCurrentProduct] = useState({
-        id: null,
+    const { currentProduct, message } = useSelector((state) => state.products);
+
+    const [form, setForm] = useState({
         name: "",
         description: "",
         ingredients: "",
-        image: "",
         type: "common",
         price: 0,
         sale_price: 0,
+        imageFile: null,
     });
-
-    const [message, setMessage] = useState("");
     const [previewImage, setPreviewImage] = useState(null);
 
-    // 📌 Получение продукта, если id != 0
-    const getProduct = async (id) => {
-        try {
-            if (id === "0") return; // новый продукт — не запрашиваем
-            const response = await ProductService.get(id);
-            setCurrentProduct(response.data);
-            setPreviewImage(response.data.image || null);
-        } catch (e) {
-            console.error(e);
-        }
-    };
+    useEffect(() => {
+        if (!isNew) dispatch(fetchProductById(id));
+        else {
+            dispatch(clearMessage());
+            setForm({
+                name: "",
+                description: "",
+                ingredients: "",
+                type: "common",
+                price: 0,
+                sale_price: 0,
+                imageFile: null,
+            });
+            setPreviewImage(null);
+        };
+    }, [dispatch, id, isNew]);
 
     useEffect(() => {
-        getProduct(id).catch(console.error);
-    }, [id]);
+        if (currentProduct && !isNew) {
+            setForm(currentProduct);
+            setPreviewImage(currentProduct.image);
+        }
+    }, [currentProduct, isNew]);
 
-    // 📌 Изменение полей
-    const handleInputChange = (event) => {
-        const { name, value } = event.target;
-        setCurrentProduct((prev) => ({ ...prev, [name]: value }));
+    const handleChange = (e) => {
+        setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
-    // 📌 Выбор изображения
     const handleImageChange = (e) => {
         const file = e.target.files[0];
-        if (file) {
-            setPreviewImage(URL.createObjectURL(file)); // для показа превью
-            setCurrentProduct((prev) => ({ ...prev, imageFile: file })); // сохраняем файл
+        setForm((prev) => ({ ...prev, imageFile: file }));
+        setPreviewImage(URL.createObjectURL(file));
+    };
+
+    const handleSave = () => {
+        const formData = new FormData();
+        Object.entries(form).forEach(([key, value]) => {
+            if (key !== "imageFile") formData.append(key, value);
+        });
+        if (form.imageFile) formData.append("image", form.imageFile);
+
+        if (isNew) {
+            dispatch(createProduct(formData)).then((res) => {
+                if (!res.error) navigate(`/products/edit/${res.payload.id}`);
+            });
+        } else {
+            dispatch(updateProduct({ id, formData }));
         }
     };
 
-
-    // 📌 Create или Update
-    const saveProduct = async () => {
-        try {
-            const formData = new FormData();
-            formData.append("name", currentProduct.name);
-            formData.append("description", currentProduct.description);
-            formData.append("ingredients", currentProduct.ingredients);
-            formData.append("type", currentProduct.type);
-            formData.append("price", currentProduct.price);
-            formData.append("sale_price", currentProduct.sale_price);
-
-            if (currentProduct.imageFile) {
-                formData.append("image", currentProduct.imageFile);
-            }
-
-            if (isNew) {
-                const response = await ProductService.create(formData);
-                console.log(response.data);
-                setMessage("The product was created successfully!");
-                navigate(`/products/${response.data.id}`);
-            } else {
-                await ProductService.update(currentProduct.id, formData);
-                setMessage("The product was updated successfully!");
-            }
-        } catch (e) {
-            console.error(e);
-        }
+    const handleDelete = () => {
+        dispatch(deleteProduct(id)).then(() => navigate("/products"));
     };
-
-
-    // 📌 Delete (только для существующего продукта)
-    const deleteProduct = async () => {
-        try {
-            await ProductService.remove(currentProduct.id);
-            navigate("/products");
-        } catch (e) {
-            console.error(e);
-        }
-    };
-
-    const isNew = id === "0";
 
     return (
-        <div className="max-w-lg mx-auto p-4 bg-white rounded shadow">
-            <h4 className="font-bold text-xl mb-4">
+        <div className="max-w-lg mx-auto p-6 bg-white rounded-2xl shadow-lg">
+            <h4 className="font-bold text-2xl mb-4 text-gray-800">
                 {isNew ? "Add Product" : "Edit Product"}
             </h4>
 
-            <div className="mb-2">
-                <label className="block font-medium" htmlFor="name">Name</label>
+            {/* Name */}
+            <div className="mb-4">
+                <label className="block font-medium mb-1">Name</label>
                 <input
                     type="text"
-                    id="name"
                     name="name"
-                    value={currentProduct.name}
-                    onChange={handleInputChange}
-                    className="border border-gray-300 rounded w-full px-2 py-1"
+                    value={form.name}
+                    onChange={handleChange}
+                    className="border border-gray-300 rounded-lg w-full px-3 py-2 focus:ring focus:ring-blue-300"
                 />
             </div>
 
-            <div className="mb-2">
-                <label className="block font-medium" htmlFor="description">Description</label>
+            {/* Description */}
+            <div className="mb-4">
+                <label className="block font-medium mb-1">Description</label>
                 <textarea
-                    id="description"
                     name="description"
-                    value={currentProduct.description}
-                    onChange={handleInputChange}
-                    className="border border-gray-300 rounded w-full px-2 py-1"
+                    value={form.description}
+                    onChange={handleChange}
+                    className="border border-gray-300 rounded-lg w-full px-3 py-2 focus:ring focus:ring-blue-300"
                 />
             </div>
 
-            <div className="mb-2">
-                <label className="block font-medium" htmlFor="ingredients">Ingredients</label>
+            {/* Ingredients */}
+            <div className="mb-4">
+                <label className="block font-medium mb-1">Ingredients</label>
                 <textarea
-                    id="ingredients"
                     name="ingredients"
-                    value={currentProduct.ingredients}
-                    onChange={handleInputChange}
-                    className="border border-gray-300 rounded w-full px-2 py-1"
+                    value={form.ingredients}
+                    onChange={handleChange}
+                    className="border border-gray-300 rounded-lg w-full px-3 py-2 focus:ring focus:ring-blue-300"
                 />
             </div>
 
-            <div className="mb-2">
-                <label className="block font-medium" htmlFor="type">Type</label>
+            {/* Type */}
+            <div className="mb-4">
+                <label className="block font-medium mb-1">Type</label>
                 <select
-                    id="type"
                     name="type"
-                    value={currentProduct.type}
-                    onChange={handleInputChange}
-                    className="border border-gray-300 rounded w-full px-2 py-1"
+                    value={form.type}
+                    onChange={handleChange}
+                    className="border border-gray-300 rounded-lg w-full px-3 py-2 focus:ring focus:ring-blue-300"
                 >
                     <option value="common">Common</option>
                     <option value="alcohol">Alcohol</option>
                 </select>
             </div>
 
-            <div className="mb-2 flex gap-2">
+            {/* Prices */}
+            <div className="flex gap-4 mb-4">
                 <div className="flex-1">
-                    <label className="block font-medium" htmlFor="price">Price</label>
+                    <label className="block font-medium mb-1">Price</label>
                     <input
                         type="number"
-                        id="price"
                         name="price"
-                        value={currentProduct.price}
-                        onChange={handleInputChange}
-                        className="border border-gray-300 rounded w-full px-2 py-1"
+                        value={form.price}
+                        onChange={handleChange}
+                        className="border border-gray-300 rounded-lg w-full px-3 py-2 focus:ring focus:ring-blue-300"
                     />
                 </div>
                 <div className="flex-1">
-                    <label className="block font-medium" htmlFor="sale_price">Sale Price</label>
+                    <label className="block font-medium mb-1">Sale Price</label>
                     <input
                         type="number"
-                        id="sale_price"
                         name="sale_price"
-                        value={currentProduct.sale_price}
-                        onChange={handleInputChange}
-                        className="border border-gray-300 rounded w-full px-2 py-1"
+                        value={form.sale_price}
+                        onChange={handleChange}
+                        className="border border-gray-300 rounded-lg w-full px-3 py-2 focus:ring focus:ring-blue-300"
                     />
                 </div>
             </div>
 
+            {/* Image */}
             <div className="mb-4">
-                <label className="block font-medium">Image</label>
+                <label className="block font-medium mb-1">Image</label>
                 {previewImage && (
                     <img
-                        src={previewImage.startsWith('blob') ? previewImage : `${BACKEND_URL}/${previewImage}`}
+                        src={
+                            previewImage.startsWith("blob")
+                                ? previewImage
+                                : `${BACKEND_URL}/${previewImage}`
+                        }
                         alt="preview"
-                        className="mb-2 w-full h-40 object-cover rounded"
+                        className="mb-2 w-full h-48 object-cover rounded-xl shadow"
                     />
                 )}
                 <input
                     type="file"
                     accept="image/*"
                     onChange={handleImageChange}
-                    className="border border-gray-300 rounded w-full px-2 py-1"
+                    className="border border-gray-300 rounded-lg w-full px-3 py-2"
                 />
             </div>
 
-            <div className="space-x-2 mt-2">
+            {/* Buttons */}
+            <div className="flex gap-3 mt-4">
                 {!isNew && (
                     <button
-                        className="bg-red-500 text-white px-3 py-1 rounded"
-                        onClick={deleteProduct}
+                        className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition"
+                        onClick={handleDelete}
                     >
                         Delete
                     </button>
                 )}
-
                 <button
-                    className="bg-green-500 text-white px-3 py-1 rounded"
-                    onClick={saveProduct}
+                    className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition"
+                    onClick={handleSave}
                 >
                     {isNew ? "Create" : "Update"}
                 </button>
             </div>
 
-            {message && <p className="text-green-600 mt-2">{message}</p>}
+            {message && <p className="text-green-600 mt-3">{message}</p>}
         </div>
     );
 }
