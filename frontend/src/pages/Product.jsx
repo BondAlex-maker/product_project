@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import ProductService from "../services/product.service";
-import {BACKEND_URL} from "../helper/backendURL.js"
+import {BACKEND_URL} from "../helpers/backendURL.js"
 
 function ProductEdit() {
     const { id } = useParams(); // id может быть "0" для нового продукта

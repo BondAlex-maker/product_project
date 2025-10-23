@@ -28,20 +28,20 @@ export default function (app) {
     // Retrieve all Common Products
     app.get(
         "/api/products/common",
-        [authJwt.verifyToken, authJwt.isAdmin],
+        // [authJwt.verifyToken, authJwt.isAdmin],
         products.findAllCommon
     );
 
     // Retrieve all Alcoholic Products
     app.get(
         "/api/products/alcohol",
-        [authJwt.verifyToken, authJwt.isAdmin],
+        // [authJwt.verifyToken, authJwt.isAdmin],
         products.findAllAlcohol
     );
 
     // Retrieve a single Product by ID
     app.get(
-        "/api/products/:id",
+        "/api/products/edit/:id",
         [authJwt.verifyToken, authJwt.isAdmin],
         products.findOne
     );
@@ -49,7 +49,7 @@ export default function (app) {
     // Update a Product by ID
     app.put(
         "/api/products/:id",
-        [authJwt.verifyToken, authJwt.isAdmin],
+        [authJwt.verifyToken, authJwt.isAdmin, upload.single("image")],
         products.update
     );
 

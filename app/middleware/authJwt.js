@@ -13,7 +13,7 @@ const { TokenExpiredError } = jwt;
 //
 //     return res.sendStatus(401).send({ message: "Unauthorized!" });
 // }
-// helper to make jwt.verify work with await
+// helpers to make jwt.verify work with await
 const verifyTokenAsync = (token, secret) =>
     new Promise((resolve, reject) => {
         jwt.verify(token, secret, (err, decoded) => {

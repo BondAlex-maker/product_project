@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import ProductService from "../services/product.service";
-import {BACKEND_URL} from "../helper/backendURL.js"
+import {BACKEND_URL} from "../helpers/backendURL.js"
+import {useSelector} from "react-redux";
 
 function ProductsList() {
     const [products, setProducts] = useState({
@@ -14,6 +15,7 @@ function ProductsList() {
     const [page, setPage] = useState(Number(searchParams.get("page")) || 0);
     const [limit, setLimit] = useState(Number(searchParams.get("limit")) || 6);
 
+    const { user: currentUser } = useSelector((state) => state.auth);
     const [currentProduct, setCurrentProduct] = useState(null);
     const [currentIndex, setCurrentIndex] = useState(-1);
     const [searchName, setSearchName] = useState(searchParams.get("name") || "");
@@ -34,7 +36,14 @@ function ProductsList() {
     };
 
     const retrieveProducts = async (pageNumber, pageSize, searchNameParam) => {
-        const response = await ProductService.getAll(pageNumber, pageSize, searchNameParam);
+        let response;
+
+        if (location.pathname.includes("/products/alcohol")) {
+            response = await ProductService.getAllAlcohol(pageNumber, pageSize, searchNameParam);
+        } else {
+            response = await ProductService.getAllCommon(pageNumber, pageSize, searchNameParam);
+        }
+        // const response = await ProductService.getAll(pageNumber, pageSize, searchNameParam);
         setProducts(response.data);
     };
 
@@ -129,6 +138,9 @@ function ProductsList() {
                             {product.ingredients && (
                                 <p className="text-gray-700 text-sm">{product.ingredients}</p>
                             )}
+                            {product.description && (
+                                <p className="text-gray-700 text-sm">{product.description}</p>
+                            )}
                             <p className="mt-auto font-semibold">
                                 ${product.price}
                                 {product.sale_price && (
@@ -137,12 +149,15 @@ function ProductsList() {
                                     </span>
                                 )}
                             </p>
-                            <Link
-                                to={`/products/${product.id}`}
-                                className="mt-2 bg-yellow-400 text-black px-3 py-1 rounded inline-block text-center"
-                            >
-                                Edit
-                            </Link>
+
+                            {currentUser?.roles?.includes("ROLE_ADMIN") && (
+                                <Link
+                                    to={`/products/edit/${product.id}`}
+                                    className="bg-yellow-400 text-black px-3 py-1 rounded inline-block text-center hover:bg-yellow-500"
+                                >
+                                    Edit
+                                </Link>
+                            )}
                         </div>
                     ))}
             </div>

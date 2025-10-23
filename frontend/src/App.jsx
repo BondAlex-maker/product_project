@@ -65,23 +65,30 @@ function App() {
                                             Admin Board
                                         </Link>
                                     </li>
-                                    <li className="nav-item">
-                                        <Link to="/products" className="hover:text-gray-300 font-bold">
-                                        Tutorials
-                                        </Link>
-                                    </li>
-                                    <li className="nav-item">
-                                        <Link to="/products/0" className="hover:text-gray-300">
-                                        Add
-                                        </Link>
-                                    </li>
                                 </>
-                                )}
+                            )}
 
                             {currentUser && (
                                 <li className="nav-item">
                                     <Link to={"/user"} className="nav-link">
                                         User
+                                    </Link>
+                                </li>
+                            )}
+                            <li className="nav-item">
+                                <Link to="/products/common" className="hover:text-gray-300">
+                                    Common Jelly
+                                </Link>
+                            </li>
+                            <li className="nav-item">
+                                <Link to="/products/alcohol" className="hover:text-gray-300">
+                                    Alcohol Jelly
+                                </Link>
+                            </li>
+                            {showAdminBoard && (
+                                <li className="nav-item">
+                                    <Link to="/products/0" className="hover:text-gray-300">
+                                        Add
                                     </Link>
                                 </li>
                             )}
@@ -91,7 +98,7 @@ function App() {
                             <div className="navbar-nav ml-auto">
                                 <li className="nav-item">
                                     <Link to={"/profile"} className="nav-link">
-                                        {currentUser.username}
+                                    {currentUser.username}
                                     </Link>
                                 </li>
                                 <li className="nav-item">
@@ -130,8 +137,9 @@ function App() {
                         <Route path="/mod" element={<BoardModerator />} />
                         <Route path="/admin" element={<BoardAdmin />} />
                         {/*<Route path="/" element={<TutorialsList />} />*/}
-                        <Route path="/products" element={<ProductsList />} />
-                        <Route path="/products/:id" element={<Product />} />
+                        <Route path="/products/common" element={<ProductsList />} />
+                        <Route path="/products/alcohol" element={<ProductsList />} />
+                        <Route path="/products/edit/:id" element={<Product />} />
                     </Routes>
                 </div>
             </div>

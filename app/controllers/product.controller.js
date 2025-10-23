@@ -77,16 +77,39 @@ export const update = async (req, res) => {
     const id = req.params.id;
 
     try {
-        const [num] = await Product.update(req.body, { where: { id } });
-        if (num === 1) res.send({ message: "Product was updated successfully." });
-        else
-            res.send({
-                message: `Cannot update Product with id=${id}. Maybe Product was not found or req.body is empty!`,
+        // Prepare updated fields (just like in `create`)
+        const updatedFields = {
+            name: req.body.name,
+            description: req.body.description,
+            ingredients: req.body.ingredients,
+            type: req.body.type || "common",
+            price: req.body.price ? parseFloat(req.body.price) : null,
+            sale_price: req.body.sale_price ? parseFloat(req.body.sale_price) : null,
+        };
+
+        // If a new image was uploaded, update the image path
+        if (req.file) {
+            updatedFields.image = `uploads/products/${req.file.filename}`;
+        }
+
+        // Perform update
+        const [num] = await Product.update(updatedFields, { where: { id } });
+
+        if (num === 1) {
+            res.send({ message: "Product was updated successfully." });
+        } else {
+            res.status(404).send({
+                message: `Cannot update Product with id=${id}. Maybe Product was not found or request body is empty!`,
             });
+        }
     } catch (err) {
-        res.status(500).send({ message: `Error updating Product with id=${id}.` });
+        console.error(err);
+        res.status(500).send({
+            message: `Error updating Product with id=${id}.`,
+        });
     }
 };
+
 
 // Delete a Product by ID
 export const deleteOne = async (req, res) => {
@@ -113,42 +136,26 @@ export const deleteAll = async (req, res) => {
     }
 };
 
-// Find all Common Products
-export const findAllCommon = async (req, res) => {
-    const { page, size } = req.query;
+const findAllByType = async (req, res, type) => {
+    const { page, size, name } = req.query;
     const { limit, offset } = getPagination(page, size);
+    const condition = {
+        type,
+        ...(name ? { name: { [Op.iLike]: `%${name}%` } } : {}),
+    };
 
     try {
         const data = await Product.findAndCountAll({
-            where: { type: "common" },
+            where: condition,
             limit,
             offset,
+            order: [["createdAt", "DESC"]],
         });
         const response = getPagingData(data, page, limit);
         res.send(response);
     } catch (err) {
-        res.status(500).send({
-            message: err.message || "Some error occurred while retrieving common products.",
-        });
+        res.status(500).send({ message: err.message });
     }
 };
-
-// Find all Alcohol Products
-export const findAllAlcohol = async (req, res) => {
-    const { page, size } = req.query;
-    const { limit, offset } = getPagination(page, size);
-
-    try {
-        const data = await Product.findAndCountAll({
-            where: { type: "alcohol" },
-            limit,
-            offset,
-        });
-        const response = getPagingData(data, page, limit);
-        res.send(response);
-    } catch (err) {
-        res.status(500).send({
-            message: err.message || "Some error occurred while retrieving alcohol products.",
-        });
-    }
-};
+export const findAllCommon = (req, res) => findAllByType(req, res, "common");
+export const findAllAlcohol = (req, res) => findAllByType(req, res, "alcohol");

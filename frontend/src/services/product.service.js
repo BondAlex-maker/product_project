@@ -1,20 +1,20 @@
 import api from './api';
 
 class ProductService {
-    getAll(pageNumber, pageSize, searchName) {
-        return api.get(`/products?page=${pageNumber}&size=${pageSize}&name=${searchName}`);
+    // getAll(pageNumber, pageSize, searchName) {
+    //     return api.get(`/products?page=${pageNumber}&size=${pageSize}&name=${searchName}`);
+    // }
+
+    getAllCommon(pageNumber, pageSize, searchName) {
+        return api.get(`/products/common?page=${pageNumber}&size=${pageSize}&name=${searchName}`);
     }
 
-    getAllCommon(pageNumber, pageSize) {
-        return api.get(`/products/common?page=${pageNumber}&size=${pageSize}`);
-    }
-
-    getAllAlcohol(pageNumber, pageSize) {
-        return api.get(`/products/alcohol?page=${pageNumber}&size=${pageSize}`);
+    getAllAlcohol(pageNumber, pageSize, searchName) {
+        return api.get(`/products/alcohol?page=${pageNumber}&size=${pageSize}&name=${searchName}`);
     }
 
     get(id) {
-        return api.get(`/products/${id}`);
+        return api.get(`/products/edit/${id}`);
     }
 
     create = (data) => {
