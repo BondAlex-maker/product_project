@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSearchParams, Link, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -18,17 +18,34 @@ function ProductsList() {
 
     const [searchParams, setSearchParams] = useSearchParams();
     const [page, setPage] = useState(Number(searchParams.get("page")) || 0);
-    const [limit, setLimit] = useState(Number(searchParams.get("limit")) || 6);
-    const [name, setName] = useState(searchParams.get("name") || "");
+    const [limit] = useState(Number(searchParams.get("limit")) || 6);
+    const [nameInput, setNameInput] = useState(searchParams.get("name") || "");
+    const prevPathRef = useRef(location.pathname);
 
+    // Сброс input при смене типа продукта
     useEffect(() => {
-        const params = { page, limit, name };
+        if (prevPathRef.current !== location.pathname) {
+            setNameInput(""); // очищаем поле поиска
+            setPage(0); // сбрасываем страницу
+            setSearchParams({ page: 0 }); // обновляем URL
+        }
+        prevPathRef.current = location.pathname;
+    }, [location.pathname, setSearchParams]);
+
+    // Fetch products
+    useEffect(() => {
+        const params = { page, limit, name: searchParams.get("name") || "" };
         if (location.pathname.includes("/products/alcohol")) {
             dispatch(fetchAlcoholProducts(params));
         } else {
             dispatch(fetchCommonProducts(params));
         }
-    }, [dispatch, location.pathname, page, limit, name]);
+    }, [dispatch, location.pathname, page, limit, searchParams]);
+
+    const handleSearch = () => {
+        setPage(0);
+        setSearchParams({ name: nameInput, page: 0 });
+    };
 
     return (
         <div className="p-6 bg-gray-50 min-h-screen">
@@ -43,13 +60,16 @@ function ProductsList() {
                     <div className="flex items-center space-x-2">
                         <input
                             type="text"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
+                            value={nameInput}
+                            onChange={(e) => setNameInput(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") handleSearch();
+                            }}
                             placeholder="Search..."
                             className="border rounded px-3 py-2"
                         />
                         <button
-                            onClick={() => setSearchParams({ name, page: 0 })}
+                            onClick={handleSearch}
                             className="bg-blue-500 text-white px-3 py-2 rounded"
                         >
                             Search
