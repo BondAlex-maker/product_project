@@ -1,33 +1,43 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, ChangeEvent, KeyboardEvent } from "react";
 import { useSearchParams, Link, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import {
-    fetchCommonProducts,
-    fetchAlcoholProducts,
-} from "../slices/productSlice";
-import { BACKEND_URL } from "../helpers/backendURL.js";
+import { fetchCommonProducts, fetchAlcoholProducts } from "../slices/productSlice";
+import { RootState, AppDispatch } from "../store";
+import { BACKEND_URL } from "../helpers/backendURL";
+
+interface Product {
+    id: number;
+    name: string;
+    description?: string;
+    ingredients?: string;
+    type: "common" | "alcohol";
+    price?: number;
+    sale_price?: number;
+    image?: string;
+    [key: string]: any;
+}
 
 function ProductsList() {
     const location = useLocation();
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
 
-    const { user: currentUser } = useSelector((state) => state.auth);
+    const { user: currentUser } = useSelector((state: RootState) => state.auth);
     const { list: products, totalPages, currentPage, loading } = useSelector(
-        (state) => state.products
+        (state: RootState) => state.products
     );
 
     const [searchParams, setSearchParams] = useSearchParams();
-    const [page, setPage] = useState(Number(searchParams.get("page")) || 0);
-    const [limit] = useState(Number(searchParams.get("limit")) || 6);
-    const [nameInput, setNameInput] = useState(searchParams.get("name") || "");
+    const [page, setPage] = useState<number>(Number(searchParams.get("page")) || 0);
+    const [limit] = useState<number>(Number(searchParams.get("limit")) || 6);
+    const [nameInput, setNameInput] = useState<string>(searchParams.get("name") || "");
     const prevPathRef = useRef(location.pathname);
 
     // Сброс input при смене типа продукта
     useEffect(() => {
         if (prevPathRef.current !== location.pathname) {
-            setNameInput(""); // очищаем поле поиска
-            setPage(0); // сбрасываем страницу
-            setSearchParams({ page: 0 }); // обновляем URL
+            setNameInput("");
+            setPage(0);
+            setSearchParams({ page: 0 });
         }
         prevPathRef.current = location.pathname;
     }, [location.pathname, setSearchParams]);
@@ -47,6 +57,14 @@ function ProductsList() {
         setSearchParams({ name: nameInput, page: 0 });
     };
 
+    const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+        setNameInput(e.target.value);
+    };
+
+    const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Enter") handleSearch();
+    };
+
     return (
         <div className="p-6 bg-gray-50 min-h-screen">
             <div className="max-w-6xl mx-auto">
@@ -61,10 +79,8 @@ function ProductsList() {
                         <input
                             type="text"
                             value={nameInput}
-                            onChange={(e) => setNameInput(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter") handleSearch();
-                            }}
+                            onChange={handleInputChange}
+                            onKeyDown={handleKeyDown}
                             placeholder="Search..."
                             className="border rounded px-3 py-2"
                         />
@@ -81,7 +97,7 @@ function ProductsList() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {products.length > 0 ? (
-                        products.map((product) => (
+                        products.map((product: Product) => (
                             <div
                                 key={product.id}
                                 className="bg-white border rounded-xl shadow hover:shadow-md transition p-4 flex flex-col"
@@ -93,17 +109,15 @@ function ProductsList() {
                                         className="w-full h-48 object-cover rounded-md mb-3"
                                     />
                                 )}
-                                <h3 className="font-semibold text-lg truncate">
-                                    {product.name}
-                                </h3>
+                                <h3 className="font-semibold text-lg truncate">{product.name}</h3>
                                 <p className="text-gray-600 text-sm flex-1">
                                     {product.description || "No description"}
                                 </p>
                                 <p className="text-gray-600 text-sm flex-1">
-                                    {product.ingredients || "No description"}
+                                    {product.ingredients || "No ingredients"}
                                 </p>
                                 <p className="font-bold mt-2">
-                                    ${product.sale_price || product.price}
+                                    ${product.sale_price ?? product.price ?? 0}
                                 </p>
 
                                 {currentUser?.roles?.includes("ROLE_ADMIN") && (

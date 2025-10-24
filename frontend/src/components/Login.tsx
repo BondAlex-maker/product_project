@@ -6,22 +6,27 @@ import * as Yup from "yup";
 
 import { login } from "../slices/auth";
 import { clearMessage } from "../slices/message";
+import { RootState, AppDispatch } from "../store";
 
-const Login = () => {
-    let navigate = useNavigate();
+interface LoginForm {
+    username: string;
+    password: string;
+}
+
+const Login: React.FC = () => {
+    const navigate = useNavigate();
+    const dispatch = useDispatch<AppDispatch>();
 
     const [loading, setLoading] = useState(false);
 
-    const { isLoggedIn } = useSelector((state) => state.auth);
-    const { message } = useSelector((state) => state.message);
-
-    const dispatch = useDispatch();
+    const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
+    const message = useSelector((state: RootState) => state.message.message);
 
     useEffect(() => {
         dispatch(clearMessage());
     }, [dispatch]);
 
-    const initialValues = {
+    const initialValues: LoginForm = {
         username: "",
         password: "",
     };
@@ -31,7 +36,7 @@ const Login = () => {
         password: Yup.string().required("This field is required!"),
     });
 
-    const handleLogin = (formValue) => {
+    const handleLogin = (formValue: LoginForm) => {
         const { username, password } = formValue;
         setLoading(true);
 
@@ -64,7 +69,7 @@ const Login = () => {
                     validationSchema={validationSchema}
                     onSubmit={handleLogin}
                 >
-                    {({errors, touched}) => (
+                    {({ errors, touched }) => (
                         <Form className="space-y-6">
                             {/* Username */}
                             <div>

@@ -1,27 +1,25 @@
 import React, { useState, useEffect } from "react";
-
 import UserService from "../services/user.service";
 
-const BoardAdmin = () => {
-    const [content, setContent] = useState("Admin");
+const Home: React.FC = () => {
+    const [content, setContent] = useState<string>("");
 
     useEffect(() => {
-        const fetchUserBoard = async () => {
+        const fetchContent = async () => {
             try {
-                const response = await UserService.getAdminBoard();
-                setContent(response.data);
-            } catch (error) {
+                const response = await UserService.getPublicContent();
+                // Тип response.data зависит от того, что возвращает сервер
+                setContent(response.data as string);
+            } catch (error: any) {
                 const _content =
-                    (error.response &&
-                        error.response.data &&
-                        error.response.data.message) ||
+                    (error.response && error.response.data) ||
                     error.message ||
                     error.toString();
                 setContent(_content);
             }
         };
 
-        fetchUserBoard().catch(console.error);
+        fetchContent().catch(console.error);
     }, []);
 
     return (
@@ -33,4 +31,4 @@ const BoardAdmin = () => {
     );
 };
 
-export default BoardAdmin;
+export default Home;

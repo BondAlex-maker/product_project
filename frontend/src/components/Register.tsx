@@ -1,23 +1,28 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Formik, Field, Form, ErrorMessage } from "formik";
+import { Formik, Field, Form, ErrorMessage, FormikHelpers } from "formik";
 import * as Yup from "yup";
 
 import { register } from "../slices/auth";
 import { clearMessage } from "../slices/message";
-import Login from "./Login.jsx";
+import { RootState, AppDispatch } from "../store";
 
-const Register = () => {
+interface RegisterFormValues {
+    username: string;
+    email: string;
+    password: string;
+}
+
+const Register: React.FC = () => {
     const [successful, setSuccessful] = useState(false);
-
-    const { message } = useSelector((state) => state.message);
-    const dispatch = useDispatch();
+    const { message } = useSelector((state: RootState) => state.message);
+    const dispatch = useDispatch<AppDispatch>();
 
     useEffect(() => {
         dispatch(clearMessage());
     }, [dispatch]);
 
-    const initialValues = {
+    const initialValues: RegisterFormValues = {
         username: "",
         email: "",
         password: "",
@@ -25,29 +30,23 @@ const Register = () => {
 
     const validationSchema = Yup.object().shape({
         username: Yup.string()
-            .test(
-                "len",
-                "The username must be between 3 and 20 characters.",
-                (val) =>
-                    val && val.toString().length >= 3 && val.toString().length <= 20
-            )
+            .min(3, "The username must be between 3 and 20 characters.")
+            .max(20, "The username must be between 3 and 20 characters.")
             .required("This field is required!"),
         email: Yup.string()
             .email("This is not a valid email.")
             .required("This field is required!"),
         password: Yup.string()
-            .test(
-                "len",
-                "The password must be between 6 and 40 characters.",
-                (val) =>
-                    val && val.toString().length >= 6 && val.toString().length <= 40
-            )
+            .min(6, "The password must be between 6 and 40 characters.")
+            .max(40, "The password must be between 6 and 40 characters.")
             .required("This field is required!"),
     });
 
-    const handleRegister = (formValue) => {
+    const handleRegister = (
+        formValue: RegisterFormValues,
+        { setSubmitting }: FormikHelpers<RegisterFormValues>
+    ) => {
         const { username, email, password } = formValue;
-
         setSuccessful(false);
 
         dispatch(register({ username, email, password }))
@@ -57,6 +56,9 @@ const Register = () => {
             })
             .catch(() => {
                 setSuccessful(false);
+            })
+            .finally(() => {
+                setSubmitting(false);
             });
     };
 
@@ -74,20 +76,26 @@ const Register = () => {
                     validationSchema={validationSchema}
                     onSubmit={handleRegister}
                 >
-                    {({errors, touched}) => (
+                    {({ errors, touched, isSubmitting }) => (
                         <Form className="space-y-6">
                             {!successful && (
                                 <>
                                     {/* Username */}
                                     <div>
-                                        <label htmlFor="username" className="block text-gray-700 font-medium mb-2">
+                                        <label
+                                            htmlFor="username"
+                                            className="block text-gray-700 font-medium mb-2"
+                                        >
                                             Username
                                         </label>
                                         <Field
+                                            id="username"
                                             name="username"
                                             type="text"
                                             className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 ${
-                                                errors.username && touched.username ? "border-red-500" : "border-gray-300"
+                                                errors.username && touched.username
+                                                    ? "border-red-500"
+                                                    : "border-gray-300"
                                             }`}
                                         />
                                         <ErrorMessage
@@ -99,14 +107,20 @@ const Register = () => {
 
                                     {/* Email */}
                                     <div>
-                                        <label htmlFor="email" className="block text-gray-700 font-medium mb-2">
+                                        <label
+                                            htmlFor="email"
+                                            className="block text-gray-700 font-medium mb-2"
+                                        >
                                             Email
                                         </label>
                                         <Field
+                                            id="email"
                                             name="email"
                                             type="email"
                                             className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 ${
-                                                errors.email && touched.email ? "border-red-500" : "border-gray-300"
+                                                errors.email && touched.email
+                                                    ? "border-red-500"
+                                                    : "border-gray-300"
                                             }`}
                                         />
                                         <ErrorMessage
@@ -118,14 +132,20 @@ const Register = () => {
 
                                     {/* Password */}
                                     <div>
-                                        <label htmlFor="password" className="block text-gray-700 font-medium mb-2">
+                                        <label
+                                            htmlFor="password"
+                                            className="block text-gray-700 font-medium mb-2"
+                                        >
                                             Password
                                         </label>
                                         <Field
+                                            id="password"
                                             name="password"
                                             type="password"
                                             className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 ${
-                                                errors.password && touched.password ? "border-red-500" : "border-gray-300"
+                                                errors.password && touched.password
+                                                    ? "border-red-500"
+                                                    : "border-gray-300"
                                             }`}
                                         />
                                         <ErrorMessage
@@ -139,6 +159,7 @@ const Register = () => {
                                     <div>
                                         <button
                                             type="submit"
+                                            disabled={isSubmitting}
                                             className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg"
                                         >
                                             Sign Up
@@ -155,7 +176,9 @@ const Register = () => {
                     <div className="mt-4">
                         <div
                             className={`px-4 py-3 rounded ${
-                                successful ? "bg-green-100 border border-green-400 text-green-700" : "bg-red-100 border border-red-400 text-red-700"
+                                successful
+                                    ? "bg-green-100 border border-green-400 text-green-700"
+                                    : "bg-red-100 border border-red-400 text-red-700"
                             }`}
                             role="alert"
                         >

@@ -1,44 +1,50 @@
 import axiosInstance from "./api";
 import TokenService from "./token.service";
 import { refreshToken } from "../slices/auth";
+import { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
+import { Store } from "@reduxjs/toolkit";
 
-const setup = (store) => {
+interface ExtendedAxiosRequestConfig extends AxiosRequestConfig {
+    _retry?: boolean;
+}
+
+const setupInterceptors = (store: Store) => {
     axiosInstance.interceptors.request.use(
-        (config) => {
+        (config: AxiosRequestConfig) => {
             const token = TokenService.getLocalAccessToken();
-            if (token) {
-                config.headers["x-access-token"] = token;
+            if (token && config.headers) {
+                (config.headers as Record<string, string>)["x-access-token"] = token;
             }
             return config;
         },
-        (error) => {
+        (error: any) => {
             return Promise.reject(error);
         }
     );
 
     const { dispatch } = store;
+
     axiosInstance.interceptors.response.use(
-        res => res,
-        async (err) => {
-            const originalConfig = err.config;
-            const publicPaths = ["/auth/signin", "/auth/signup", "/", '/home'];
-            if (!publicPaths.includes(originalConfig.url) && err.response) {
+        (res: AxiosResponse) => res,
+        async (err: AxiosError) => {
+            const originalConfig = err.config as ExtendedAxiosRequestConfig;
+            const publicPaths = ["/auth/signin", "/auth/signup", "/", "/home"];
+
+            if (!publicPaths.includes(originalConfig.url || "") && err.response) {
                 if (err.response.status === 401 && !originalConfig._retry) {
                     originalConfig._retry = true;
 
                     try {
-                        // вызываем thunk, который сам делает refresh
-                        const result = await dispatch(refreshToken());
+                        const result = await dispatch(refreshToken() as any); // thunk result
                         const { accessToken, refreshToken: newRefreshToken } = result.payload;
 
-                        // обновляем TokenService
                         TokenService.updateLocalAccessToken(accessToken);
                         TokenService.updateLocalRefreshToken(newRefreshToken);
 
-                        // ставим новый токен в header
-                        originalConfig.headers["x-access-token"] = accessToken;
+                        if (originalConfig.headers) {
+                            (originalConfig.headers as Record<string, string>)["x-access-token"] = accessToken;
+                        }
 
-                        // повторяем исходный запрос
                         return axiosInstance(originalConfig);
                     } catch (_error) {
                         return Promise.reject(_error);
@@ -49,7 +55,6 @@ const setup = (store) => {
             return Promise.reject(err);
         }
     );
-
 };
 
-export default setup;
+export default setupInterceptors;

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, ChangeEvent } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -8,17 +8,29 @@ import {
     deleteProduct,
     clearMessage,
 } from "../slices/productSlice";
+import { RootState, AppDispatch } from "../store";
 import { BACKEND_URL } from "../helpers/backendURL";
 
+interface ProductForm {
+    name: string;
+    description: string;
+    ingredients: string;
+    type: "common" | "alcohol";
+    price: number;
+    sale_price: number;
+    imageFile: File | null;
+    image?: string;
+}
+
 function ProductEdit() {
-    const { id } = useParams();
+    const { id } = useParams<{ id: string }>();
     const isNew = id === "0";
     const navigate = useNavigate();
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
 
-    const { currentProduct, message } = useSelector((state) => state.products);
+    const { currentProduct, message } = useSelector((state: RootState) => state.products);
 
-    const [form, setForm] = useState({
+    const [form, setForm] = useState<ProductForm>({
         name: "",
         description: "",
         ingredients: "",
@@ -27,10 +39,12 @@ function ProductEdit() {
         sale_price: 0,
         imageFile: null,
     });
-    const [previewImage, setPreviewImage] = useState(null);
 
+    const [previewImage, setPreviewImage] = useState<string | null>(null);
+
+    // Fetch product on load if editing
     useEffect(() => {
-        if (!isNew) dispatch(fetchProductById(id));
+        if (!isNew && id) dispatch(fetchProductById(id));
         else {
             dispatch(clearMessage());
             setForm({
@@ -43,44 +57,49 @@ function ProductEdit() {
                 imageFile: null,
             });
             setPreviewImage(null);
-        };
+        }
     }, [dispatch, id, isNew]);
 
+    // Populate form when currentProduct is loaded
     useEffect(() => {
         if (currentProduct && !isNew) {
-            setForm(currentProduct);
-            setPreviewImage(currentProduct.image);
+            setForm({
+                ...currentProduct,
+                imageFile: null,
+            });
+            setPreviewImage(currentProduct.image || null);
         }
     }, [currentProduct, isNew]);
 
-    const handleChange = (e) => {
-        setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        setForm((prev) => ({ ...prev, [name]: name === "price" || name === "sale_price" ? Number(value) : value }));
     };
 
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
+    const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0] || null;
         setForm((prev) => ({ ...prev, imageFile: file }));
-        setPreviewImage(URL.createObjectURL(file));
+        if (file) setPreviewImage(URL.createObjectURL(file));
     };
 
     const handleSave = () => {
         const formData = new FormData();
         Object.entries(form).forEach(([key, value]) => {
-            if (key !== "imageFile") formData.append(key, value);
+            if (key !== "imageFile" && value !== null && value !== undefined) formData.append(key, value as any);
         });
         if (form.imageFile) formData.append("image", form.imageFile);
 
         if (isNew) {
-            dispatch(createProduct(formData)).then((res) => {
+            dispatch(createProduct(formData)).then((res: any) => {
                 if (!res.error) navigate(`/products/edit/${res.payload.id}`);
             });
-        } else {
+        } else if (id) {
             dispatch(updateProduct({ id, formData }));
         }
     };
 
     const handleDelete = () => {
-        dispatch(deleteProduct(id)).then(() => navigate("/products"));
+        if (id) dispatch(deleteProduct(id)).then(() => navigate("/products"));
     };
 
     return (
@@ -166,11 +185,7 @@ function ProductEdit() {
                 <label className="block font-medium mb-1">Image</label>
                 {previewImage && (
                     <img
-                        src={
-                            previewImage.startsWith("blob")
-                                ? previewImage
-                                : `${BACKEND_URL}/${previewImage}`
-                        }
+                        src={previewImage.startsWith("blob") ? previewImage : `${BACKEND_URL}/${previewImage}`}
                         alt="preview"
                         className="mb-2 w-full h-48 object-cover rounded-xl shadow"
                     />

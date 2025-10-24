@@ -1,27 +1,24 @@
 import React, { useState, useEffect } from "react";
+import UserService from "../services/user.service.js";
 
-import UserService from "../services/user.service";
-
-const BoardUser = () => {
-    const [content, setContent] = useState("User");
+const BoardModerator = () => {
+    const [content, setContent] = useState("Moderator");
 
     useEffect(() => {
-        const fetchUserBoard = async () => {
+        const fetchModeratorBoard = async () => {
             try {
-                const response = await UserService.getUserBoard();
+                const response = await UserService.getModeratorBoard();
                 setContent(response.data);
             } catch (error) {
                 const _content =
-                    (error.response &&
-                        error.response.data &&
-                        error.response.data.message) ||
-                    error.message ||
+                    error?.response?.data?.message ||
+                    error?.message ||
                     error.toString();
                 setContent(_content);
             }
         };
 
-        fetchUserBoard().catch(console.error);
+        fetchModeratorBoard();
     }, []);
 
     return (
@@ -33,4 +30,4 @@ const BoardUser = () => {
     );
 };
 
-export default BoardUser;
+export default BoardModerator;

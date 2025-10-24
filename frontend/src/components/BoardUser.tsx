@@ -1,25 +1,24 @@
 import React, { useState, useEffect } from "react";
+import UserService from "../services/user.service.js";
 
-import UserService from "../services/user.service";
-
-const Home = () => {
-    const [content, setContent] = useState("");
+const BoardUser = () => {
+    const [content, setContent] = useState("User");
 
     useEffect(() => {
-        const fetchContent = async () => {
+        const fetchUserBoard = async () => {
             try {
-                const response = await UserService.getPublicContent();
+                const response = await UserService.getUserBoard();
                 setContent(response.data);
             } catch (error) {
                 const _content =
-                    (error.response && error.response.data) ||
-                    error.message ||
+                    error?.response?.data?.message ||
+                    error?.message ||
                     error.toString();
                 setContent(_content);
             }
         };
 
-        fetchContent().catch(console.error);
+        fetchUserBoard();
     }, []);
 
     return (
@@ -31,4 +30,4 @@ const Home = () => {
     );
 };
 
-export default Home;
+export default BoardUser;

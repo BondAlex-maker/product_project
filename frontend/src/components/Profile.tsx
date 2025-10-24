@@ -1,9 +1,20 @@
 import React from "react";
-import { Navigate } from 'react-router-dom';
+import { Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { RootState } from "../store";
 
-const Profile = () => {
-    const { user: currentUser } = useSelector((state) => state.auth);
+// Тип для пользователя
+interface User {
+    id: number | string;
+    username: string;
+    email: string;
+    roles: string[];
+}
+
+const Profile: React.FC = () => {
+    const currentUser = useSelector<RootState, User | null>(
+        (state) => state.auth.user
+    );
 
     if (!currentUser) {
         return <Navigate to="/login" />;
@@ -27,12 +38,11 @@ const Profile = () => {
             <div className="mt-4">
                 <strong>Authorities:</strong>
                 <ul className="list-disc list-inside mt-2">
-                    {currentUser.roles &&
-                        currentUser.roles.map((role, index) => (
-                            <li key={index} className="ml-2">
-                                {role}
-                            </li>
-                        ))}
+                    {currentUser.roles.map((role, index) => (
+                        <li key={index} className="ml-2">
+                            {role}
+                        </li>
+                    ))}
                 </ul>
             </div>
         </div>
