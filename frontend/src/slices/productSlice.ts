@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import ProductService, { Product } from "../services/ProductService";
+import ProductService, { Product } from "../services/product.service";
 
 // === TYPES ===
 
