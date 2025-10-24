@@ -12,121 +12,67 @@ import BoardModerator from "./components/BoardModerator";
 import BoardAdmin from "./components/BoardAdmin";
 
 import { logout } from "./slices/auth";
-import { RootState, AppDispatch } from "./store"; // импорт типов стора
-import { User } from "./services/AuthService";
+import { RootState, AppDispatch } from "./store";
 
 function App() {
+    const dispatch = useDispatch<AppDispatch>();
+    const { user: currentUser } = useSelector((state: RootState) => state.auth);
+
     const [showModeratorBoard, setShowModeratorBoard] = useState(false);
     const [showAdminBoard, setShowAdminBoard] = useState(false);
-
-    const { user: currentUser } = useSelector((state: RootState) => state.auth);
-    const dispatch = useDispatch<AppDispatch>();
 
     const logOut = useCallback(() => {
         dispatch(logout());
     }, [dispatch]);
 
     useEffect(() => {
-        if (currentUser) {
-            setShowModeratorBoard(currentUser.roles?.includes("ROLE_MODERATOR") ?? false);
-            setShowAdminBoard(currentUser.roles?.includes("ROLE_ADMIN") ?? false);
-        } else {
-            setShowModeratorBoard(false);
-            setShowAdminBoard(false);
-        }
+        setShowModeratorBoard(currentUser?.roles?.includes("ROLE_MODERATOR") ?? false);
+        setShowAdminBoard(currentUser?.roles?.includes("ROLE_ADMIN") ?? false);
     }, [currentUser]);
 
     return (
         <BrowserRouter>
-            <div>
+            <div className="min-h-screen flex flex-col">
                 {/* NAVBAR */}
-                <nav className="bg-blue-600 p-4 text-white">
-                    <div className="flex space-x-4">
-                        <Link to={"/"} className="navbar-brand">
-                            Public Page
-                        </Link>
-                        <div className="navbar-nav mr-auto">
-                            <li className="nav-item">
-                                <Link to={"/home"} className="nav-link">
-                                    Home
-                                </Link>
-                            </li>
+                <nav className="bg-blue-600 text-white p-4 shadow">
+                    <div className="container mx-auto flex flex-wrap justify-between items-center">
+                        {/* Левая часть навбара */}
+                        <div className="flex flex-wrap items-center space-x-4">
+                            <Link to="/" className="font-bold text-lg hover:text-gray-200">Public Page</Link>
+                            <Link to="/home" className="hover:text-gray-200">Home</Link>
 
-                            {showModeratorBoard && (
-                                <li className="nav-item">
-                                    <Link to={"/mod"} className="nav-link">
-                                        Moderator Board
-                                    </Link>
-                                </li>
-                            )}
-
+                            {showModeratorBoard && <Link to="/mod" className="hover:text-gray-200">Moderator Board</Link>}
                             {showAdminBoard && (
-                                <li className="nav-item">
-                                    <Link to={"/admin"} className="nav-link">
-                                        Admin Board
-                                    </Link>
-                                </li>
+                                <>
+                                    <Link to="/admin" className="hover:text-gray-200">Admin Board</Link>
+                                    <Link to="/products/edit/0" className="hover:text-gray-200">Add Product</Link>
+                                </>
                             )}
+                            {currentUser && <Link to="/user" className="hover:text-gray-200">User</Link>}
 
-                            {currentUser && (
-                                <li className="nav-item">
-                                    <Link to={"/user"} className="nav-link">
-                                        User
-                                    </Link>
-                                </li>
-                            )}
-
-                            <li className="nav-item">
-                                <Link to="/products/common" className="hover:text-gray-300">
-                                    Common Jelly
-                                </Link>
-                            </li>
-                            <li className="nav-item">
-                                <Link to="/products/alcohol" className="hover:text-gray-300">
-                                    Alcohol Jelly
-                                </Link>
-                            </li>
-                            {showAdminBoard && (
-                                <li className="nav-item">
-                                    <Link to="/products/edit/0" className="hover:text-gray-300">
-                                        Add
-                                    </Link>
-                                </li>
-                            )}
+                            <Link to="/products/common" className="hover:text-gray-200">Common Jelly</Link>
+                            <Link to="/products/alcohol" className="hover:text-gray-200">Alcohol Jelly</Link>
                         </div>
 
-                        {currentUser ? (
-                            <div className="navbar-nav ml-auto">
-                                <li className="nav-item">
-                                    <Link to={"/profile"} className="nav-link">
-                                        {currentUser.username}
-                                    </Link>
-                                </li>
-                                <li className="nav-item">
-                                    <a href="/login" className="nav-link" onClick={logOut}>
-                                        LogOut
-                                    </a>
-                                </li>
-                            </div>
-                        ) : (
-                            <div className="navbar-nav ml-auto">
-                                <li className="nav-item">
-                                    <Link to={"/login"} className="nav-link">
-                                        Login
-                                    </Link>
-                                </li>
-                                <li className="nav-item">
-                                    <Link to={"/register"} className="nav-link">
-                                        Sign Up
-                                    </Link>
-                                </li>
-                            </div>
-                        )}
+                        {/* Правая часть навбара */}
+                        <div className="flex flex-wrap items-center space-x-4 mt-2 sm:mt-0">
+                            {currentUser ? (
+                                <>
+                                    <Link to="/profile" className="hover:text-gray-200 font-medium">{currentUser.username}</Link>
+                                    <button onClick={logOut} className="hover:text-gray-200 font-medium">LogOut</button>
+                                </>
+                            ) : (
+                                <>
+                                    <Link to="/login" className="hover:text-gray-200 font-medium">Login</Link>
+                                    <Link to="/register" className="hover:text-gray-200 font-medium">Sign Up</Link>
+                                </>
+                            )}
+                        </div>
                     </div>
                 </nav>
 
                 {/* ROUTES */}
-                <div className="container mx-auto mt-8 px-4">
+                <main className="flex-1 container mx-auto mt-8 px-4">
                     <Routes>
                         <Route path="/" element={<Home />} />
                         <Route path="/home" element={<Home />} />
@@ -140,7 +86,7 @@ function App() {
                         <Route path="/products/alcohol" element={<ProductsList />} />
                         <Route path="/products/edit/:id" element={<Product />} />
                     </Routes>
-                </div>
+                </main>
             </div>
         </BrowserRouter>
     );

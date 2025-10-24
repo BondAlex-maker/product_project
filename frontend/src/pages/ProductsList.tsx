@@ -32,17 +32,17 @@ function ProductsList() {
     const [nameInput, setNameInput] = useState<string>(searchParams.get("name") || "");
     const prevPathRef = useRef(location.pathname);
 
-    // Сброс input при смене типа продукта
+    // Сбрасываем поиск при смене типа продукта
     useEffect(() => {
         if (prevPathRef.current !== location.pathname) {
             setNameInput("");
             setPage(0);
-            setSearchParams({ page: 0 });
+            setSearchParams({ page: "0" });
         }
         prevPathRef.current = location.pathname;
     }, [location.pathname, setSearchParams]);
 
-    // Fetch products
+    // Fetch products при изменении пути, страницы или поиска
     useEffect(() => {
         const params = { page, limit, name: searchParams.get("name") || "" };
         if (location.pathname.includes("/products/alcohol")) {
@@ -54,12 +54,10 @@ function ProductsList() {
 
     const handleSearch = () => {
         setPage(0);
-        setSearchParams({ name: nameInput, page: 0 });
+        setSearchParams({ name: nameInput, page: "0" });
     };
 
-    const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-        setNameInput(e.target.value);
-    };
+    const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => setNameInput(e.target.value);
 
     const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter") handleSearch();
@@ -68,13 +66,11 @@ function ProductsList() {
     return (
         <div className="p-6 bg-gray-50 min-h-screen">
             <div className="max-w-6xl mx-auto">
-                <div className="flex justify-between items-center mb-6">
+                {/* Заголовок и поиск */}
+                <div className="flex flex-col sm:flex-row justify-between items-center mb-6 space-y-3 sm:space-y-0">
                     <h2 className="text-2xl font-bold">
-                        {location.pathname.includes("/alcohol")
-                            ? "Alcohol Products"
-                            : "Common Products"}
+                        {location.pathname.includes("/alcohol") ? "Alcohol Products" : "Common Products"}
                     </h2>
-
                     <div className="flex items-center space-x-2">
                         <input
                             type="text"
@@ -86,15 +82,17 @@ function ProductsList() {
                         />
                         <button
                             onClick={handleSearch}
-                            className="bg-blue-500 text-white px-3 py-2 rounded"
+                            className="bg-blue-500 text-white px-3 py-2 rounded hover:bg-blue-600 transition"
                         >
                             Search
                         </button>
                     </div>
                 </div>
 
+                {/* Загрузка */}
                 {loading && <p className="text-center text-gray-500">Loading...</p>}
 
+                {/* Список продуктов */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {products.length > 0 ? (
                         products.map((product: Product) => (
@@ -132,9 +130,7 @@ function ProductsList() {
                         ))
                     ) : (
                         !loading && (
-                            <p className="text-gray-500 text-center col-span-full">
-                                No products found.
-                            </p>
+                            <p className="text-gray-500 text-center col-span-full">No products found.</p>
                         )
                     )}
                 </div>
@@ -147,9 +143,7 @@ function ProductsList() {
                                 key={i}
                                 onClick={() => setPage(i)}
                                 className={`px-3 py-1 rounded ${
-                                    i === currentPage
-                                        ? "bg-blue-600 text-white"
-                                        : "bg-gray-200 hover:bg-gray-300"
+                                    i === currentPage ? "bg-blue-600 text-white" : "bg-gray-200 hover:bg-gray-300"
                                 }`}
                             >
                                 {i + 1}
