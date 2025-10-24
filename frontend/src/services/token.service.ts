@@ -1,4 +1,4 @@
-import { User } from "./AuthService";
+import { User } from "./auth.service.ts";
 
 class TokenService {
     getLocalRefreshToken(): string | undefined {

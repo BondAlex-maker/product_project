@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import UserService from "../services/user.service.js";
+import UserService from "../services/user.service.ts";
 
 const BoardAdmin = () => {
     const [content, setContent] = useState("Admin");

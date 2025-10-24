@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { setMessage } from "./message";
-import AuthService, { User, AuthResponse } from "../services/auth.service";
+import { setMessage } from "./message.ts";
+import AuthService, { User, AuthResponse } from "../services/auth.service.ts";
 
 // Получаем пользователя из localStorage
 const user: User | null = (() => {

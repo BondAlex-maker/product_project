@@ -8,8 +8,8 @@ import {
     deleteProduct,
     clearMessage,
 } from "../slices/productSlice";
-import { RootState, AppDispatch } from "../store";
-import { BACKEND_URL } from "../helpers/backendURL";
+import { RootState, AppDispatch } from "../store.ts";
+import { BACKEND_URL } from "../helpers/backendURL.ts";
 
 interface ProductForm {
     name: string;

@@ -2,7 +2,7 @@ import { useEffect, useState, useRef, ChangeEvent, KeyboardEvent } from "react";
 import { useSearchParams, Link, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchCommonProducts, fetchAlcoholProducts } from "../slices/productSlice";
-import { RootState, AppDispatch } from "../store";
+import { RootState, AppDispatch } from "../store.ts";
 import { BACKEND_URL } from "../helpers/backendURL";
 
 interface Product {

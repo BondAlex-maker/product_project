@@ -6,7 +6,7 @@ import * as Yup from "yup";
 
 import { login } from "../slices/auth";
 import { clearMessage } from "../slices/message";
-import { RootState, AppDispatch } from "../store";
+import { RootState, AppDispatch } from "../store.ts";
 
 interface LoginForm {
     username: string;

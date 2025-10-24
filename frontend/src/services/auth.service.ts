@@ -1,5 +1,5 @@
-import api from "./api";
-import TokenService from "./token.service";
+import api from "./api.ts";
+import TokenService from "./token.service.ts";
 import { AxiosResponse } from "axios";
 
 export interface User {

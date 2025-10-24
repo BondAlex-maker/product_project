@@ -1,6 +1,6 @@
-import axiosInstance from "./api";
-import TokenService from "./token.service";
-import { refreshToken } from "../slices/auth";
+import axiosInstance from "./api.ts";
+import TokenService from "./token.service.ts";
+import { refreshToken } from "../slices/auth.ts";
 import { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { Store } from "@reduxjs/toolkit";
 
