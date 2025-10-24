@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import ProductService, { Product } from "../services/product.service.ts";
+import ProductService, { Product } from "../services/product.service";
 
 // === TYPES ===
 
@@ -27,81 +27,81 @@ interface UpdateProductArgs {
 // === ASYNC THUNKS ===
 
 // get all common products
-export const fetchCommonProducts = createAsyncThunk<Product[], FetchProductsArgs, { rejectValue: string }>(
+export const fetchCommonProducts = createAsyncThunk(
     "products/fetchCommon",
-        async ({ page, limit, name }, { rejectWithValue }) => {
-            try {
-                const response = await ProductService.getAllCommon(page, limit, name);
-                return response.data.products as Product[];
-            } catch (error: any) {
-                return rejectWithValue(error.response?.data?.message || error.message);
-            }
+    async ({ page, limit, name }: FetchProductsArgs, { rejectWithValue }: any): Promise<Product[]> => {
+        try {
+            const response = await ProductService.getAllCommon(page, limit, name);
+            return response.data.products as Product[];
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || error.message);
         }
+    }
 );
 
 // get all alcohol products
-export const fetchAlcoholProducts = createAsyncThunk<Product[], FetchProductsArgs, { rejectValue: string }>(
+export const fetchAlcoholProducts = createAsyncThunk(
     "products/fetchAlcohol",
-        async ({ page, limit, name }, { rejectWithValue }) => {
-            try {
-                const response = await ProductService.getAllAlcohol(page, limit, name);
-                return response.data.products as Product[];
-            } catch (error: any) {
-                return rejectWithValue(error.response?.data?.message || error.message);
-            }
+    async ({ page, limit, name }: FetchProductsArgs, { rejectWithValue }: any): Promise<Product[]> => {
+        try {
+            const response = await ProductService.getAllAlcohol(page, limit, name);
+            return response.data.products as Product[];
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || error.message);
         }
+    }
 );
 
 // get single product
-export const fetchProductById = createAsyncThunk<Product, number | string, { rejectValue: string }>(
+export const fetchProductById = createAsyncThunk(
     "products/fetchById",
-        async (id, { rejectWithValue }) => {
-            try {
-                const response = await ProductService.get(id);
-                return response.data as Product;
-            } catch (error: any) {
-                return rejectWithValue(error.response?.data?.message || error.message);
-            }
+    async (id: number | string, { rejectWithValue }: any): Promise<Product> => {
+        try {
+            const response = await ProductService.get(id);
+            return response.data as Product;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || error.message);
         }
+    }
 );
 
 // create product
-export const createProduct = createAsyncThunk<Product, FormData, { rejectValue: string }>(
+export const createProduct = createAsyncThunk(
     "products/create",
-        async (formData, { rejectWithValue }) => {
-            try {
-                const response = await ProductService.create(formData);
-                return response.data as Product;
-            } catch (error: any) {
-                return rejectWithValue(error.response?.data?.message || error.message);
-            }
+    async (formData: FormData, { rejectWithValue }: any): Promise<Product> => {
+        try {
+            const response = await ProductService.create(formData);
+            return response.data as Product;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || error.message);
         }
+    }
 );
 
 // update product
-export const updateProduct = createAsyncThunk<UpdateProductArgs, UpdateProductArgs, { rejectValue: string }>(
+export const updateProduct = createAsyncThunk(
     "products/update",
-        async ({ id, formData }, { rejectWithValue }) => {
-            try {
-                await ProductService.update(id, formData);
-                return { id, formData };
-            } catch (error: any) {
-                return rejectWithValue(error.response?.data?.message || error.message);
-            }
+    async ({ id, formData }: UpdateProductArgs, { rejectWithValue }: any): Promise<UpdateProductArgs> => {
+        try {
+            await ProductService.update(id, formData);
+            return { id, formData };
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || error.message);
         }
+    }
 );
 
 // delete product
-export const deleteProduct = createAsyncThunk<number | string, number | string, { rejectValue: string }>(
+export const deleteProduct = createAsyncThunk(
     "products/delete",
-        async (id, { rejectWithValue }) => {
-            try {
-                await ProductService.remove(id);
-                return id;
-            } catch (error: any) {
-                return rejectWithValue(error.response?.data?.message || error.message);
-            }
+    async (id: number | string, { rejectWithValue }: any): Promise<number | string> => {
+        try {
+            await ProductService.remove(id);
+            return id;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || error.message);
         }
+    }
 );
 
 // === INITIAL STATE ===
@@ -137,9 +137,9 @@ const productSlice = createSlice({
                 state.loading = false;
                 state.list = action.payload;
             })
-            .addCase(fetchCommonProducts.rejected, (state, action) => {
+            .addCase(fetchCommonProducts.rejected, (state, action: any) => {
                 state.loading = false;
-                state.error = action.payload as string;
+                state.error = action.payload;
             })
 
             // Alcohol products
@@ -150,9 +150,9 @@ const productSlice = createSlice({
                 state.loading = false;
                 state.list = action.payload;
             })
-            .addCase(fetchAlcoholProducts.rejected, (state, action) => {
+            .addCase(fetchAlcoholProducts.rejected, (state, action: any) => {
                 state.loading = false;
-                state.error = action.payload as string;
+                state.error = action.payload;
             })
 
             // Single product

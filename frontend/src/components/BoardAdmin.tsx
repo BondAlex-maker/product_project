@@ -2,13 +2,13 @@ import React, { useState, useEffect } from "react";
 import UserService from "../services/user.service.ts";
 
 const BoardAdmin = () => {
-    const [content, setContent] = useState("Admin");
+    const [content, setContent] = useState<string>("Admin");
 
     useEffect(() => {
         const fetchAdminBoard = async () => {
             try {
                 const response = await UserService.getAdminBoard();
-                setContent(response.data);
+                setContent(response.data as string);
             } catch (error) {
                 const _content =
                     error?.response?.data?.message ||

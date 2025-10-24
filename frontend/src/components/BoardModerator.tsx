@@ -2,13 +2,13 @@ import React, { useState, useEffect } from "react";
 import UserService from "../services/user.service.ts";
 
 const BoardModerator = () => {
-    const [content, setContent] = useState("Moderator");
+    const [content, setContent] = useState<string>("Moderator");
 
     useEffect(() => {
         const fetchModeratorBoard = async () => {
             try {
                 const response = await UserService.getModeratorBoard();
-                setContent(response.data);
+                setContent(response.data as string);
             } catch (error) {
                 const _content =
                     error?.response?.data?.message ||
