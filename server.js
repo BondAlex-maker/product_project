@@ -1,44 +1,54 @@
-import express from "express";
-import path from "path";
-import cors from "cors";
-import db from "./app/models/index.js";
-import productRoutes from "./app/routes/product.routes.js";
-import authRoutes from "./app/routes/auth.routes.js";
-import userRoutes from "./app/routes/user.routes.js";
-import dotenv from "dotenv";
-dotenv.config();
+import 'dotenv/config'
+import express from 'express'
+import path from 'path'
+import { fileURLToPath } from 'url'
+import cors from 'cors'
 
-const app = express();
-const Role = db.role;
+// если у тебя есть существующие роуты:
+import db from './app/models/index.js'
+import productRoutes from './app/routes/product.routes.js'
+import authRoutes from './app/routes/auth.routes.js'
+import userRoutes from './app/routes/user.routes.js'
 
-const corsOptions = {
-    origin: "http://localhost:5173",
-};
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
-app.use(cors(corsOptions));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use("/uploads", express.static(path.join(process.cwd(), "app/storage/uploads")));
-app.use(express.static("frontend/dist/client"));
+const app = express()
+const port = process.env.PORT || 5174
 
-// API
-productRoutes(app);
-authRoutes(app);
-userRoutes(app);
+app.use(cors({ origin: 'http://localhost:5173' }))
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 
-// SSR must be last
-app.get("*", async (req, res) => {
-    const { render } = await import("./frontend/dist/server/entry-server.js");
-    const html = await render(req.url);
-    res.status(200).set({ "Content-Type": "text/html" }).end(html);
-});
+// статика (клиентский бандл)
+app.use(express.static(path.join(__dirname, 'frontend', 'dist')))
+// отдать загруженные файлы
+app.use('/uploads', express.static(path.join(process.cwd(), 'app', 'storage', 'uploads')))
 
-// DB
-db.sequelize.sync({ alter: true }).then(() => {
-    console.log("Synced db.");
-});
+// твои API
+productRoutes(app)
+authRoutes(app)
+userRoutes(app)
 
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-    console.log(`Server running http://localhost:${PORT}`);
-});
+// SSR обработчик всех НЕ-API запросов
+app.get(['/', '/about', '/products', '/products/*'], async (req, res, next) => {
+  try {
+    const { render } = await import(path.join(__dirname, 'frontend', 'dist-ssr', 'entry-server.js'))
+    const fs = await import('fs/promises')
+    const template = await fs.readFile(path.join(__dirname, 'frontend', 'dist', 'index.html'), 'utf-8')
+
+    const { html, head, status } = await render(req.originalUrl)
+
+    const doc = template
+      .replace('<!--app-head-->', head || '')
+      .replace('<!--app-html-->', html)
+
+    res.status(status || 200).type('html').send(doc)
+  } catch (e) {
+    next(e)
+  }
+})
+
+app.listen(port, () => {
+  console.log(`SSR server listening at http://localhost:${port}`)
+})

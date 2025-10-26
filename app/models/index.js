@@ -1,5 +1,5 @@
 import dbConfig from "../config/db.config.js";
-import Sequelize from "sequelize";
+import { Sequelize, DataTypes } from "sequelize";
 import User from "./user.model.js";
 import RefreshToken from "./refreshToken.model.js";
 import Role from "./role.model.js";
@@ -12,16 +12,16 @@ const sequelize = new Sequelize(
         host: dbConfig.HOST,
         dialect: dbConfig.dialect,
         pool: dbConfig.pool,
-        port: dbConfig.PORT,
+        port: Number(dbConfig.PORT),
 });
 
 const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
-db.products = Product(sequelize, Sequelize);
-db.user = User(sequelize, Sequelize);
-db.refreshToken = RefreshToken(sequelize, Sequelize);
-db.role = Role(sequelize, Sequelize);
+db.products = Product(sequelize, DataTypes);
+db.user = User(sequelize, DataTypes);
+db.refreshToken = RefreshToken(sequelize, DataTypes);
+db.role = Role(sequelize, DataTypes);
 
 db.role.belongsToMany(db.user, {
     through: "user_roles"
