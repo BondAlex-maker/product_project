@@ -4,9 +4,9 @@
   "description": "Jelly Inc",
   "main": "index.js",
   "scripts": {
-    "dev:client": "vite --config ./frontend/vite.config.ts",
-    "build:client": "vite build --config ./frontend/vite.config.ts",
-    "build:ssr": "vite build --config ./frontend/vite.config.ssr.ts",
+    "dev:client": "vite --config ./frontend/vite.config.js",
+    "build:client": "vite build --config ./frontend/vite.config.js",
+    "build:ssr": "vite build --config ./frontend/vite.config.ssr.js",
     "build": "npm run build:client && npm run build:ssr && node ./scripts/prerender.mjs",
     "serve": "node ./server.js"
   },
