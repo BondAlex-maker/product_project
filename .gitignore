@@ -1,3 +1,5 @@
 /.idea
 node_modules/
 /app/storage/
+/app/config/auth.config.*
+/app/config/db.config.*
