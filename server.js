@@ -5,6 +5,8 @@ import db from "./app/models/index.js";
 import productRoutes from "./app/routes/product.routes.js";
 import authRoutes from "./app/routes/auth.routes.js";
 import userRoutes from "./app/routes/user.routes.js";
+import dotenv from "dotenv";
+dotenv.config();
 
 const app = express();
 const Role = db.role;
