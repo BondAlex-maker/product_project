@@ -1,14 +1,36 @@
-import React from "react";
+// frontend/src/entry-client.tsx
+import React, { useEffect } from "react";
 import { hydrateRoot, createRoot } from "react-dom/client";
-import { Provider } from "react-redux";
+import { Provider, useStore } from "react-redux";
+import { BrowserRouter } from "react-router-dom";
+
 import { makeStore } from "./store";
-import { AppRoutes } from "./routes";
+import App from "./App";
+
+import setupInterceptors from "./services/setupInterceptors";
+import { hydrateAuthFromStorage } from "./slices/auth";
+
+import "./index.css";
 
 const store = makeStore();
 
+/** Инициализация axios-интерсепторов + подхват user из localStorage.
+ *  Выполняется только на клиенте, уже после монтирования. */
+function Bootstrap() {
+  const s = useStore();
+  useEffect(() => {
+    setupInterceptors(s as any);
+    (s as any).dispatch(hydrateAuthFromStorage());
+  }, [s]);
+  return null;
+}
+
 const app = (
   <Provider store={store}>
-    <AppRoutes />
+    <Bootstrap />
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
   </Provider>
 );
 

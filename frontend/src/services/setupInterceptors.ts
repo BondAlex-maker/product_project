@@ -1,6 +1,6 @@
-import axiosInstance from "./api.ts";
-import TokenService from "./token.service.ts";
-import { refreshToken } from "../slices/auth.ts";
+import axiosInstance from "./api";
+import TokenService from "./token.service";
+import { refreshToken } from "../slices/auth";
 import { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { Store } from "@reduxjs/toolkit";
 
@@ -14,6 +14,7 @@ const setupInterceptors = (store: Store) => {
             const token = TokenService.getLocalAccessToken();
             if (token && config.headers) {
                 (config.headers as Record<string, string>)["x-access-token"] = token;
+                (config.headers as Record<string,string>).Authorization = `Bearer ${token}`;
             }
             return config;
         },

@@ -2,8 +2,8 @@ import { useEffect, useState, useRef, ChangeEvent, KeyboardEvent } from "react";
 import { useSearchParams, Link, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchCommonProducts, fetchAlcoholProducts } from "../slices/productSlice";
-import { RootState, AppDispatch } from "../store.ts";
-import { BACKEND_URL } from "../helpers/backendURL";
+import { RootState, AppDispatch } from "../store";
+import { toAssetUrl } from "../helpers/url";
 
 interface Product {
     id: number;
@@ -96,13 +96,14 @@ function ProductsList() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {products.length > 0 ? (
                         products.map((product: Product) => (
+                            
                             <div
                                 key={product.id}
                                 className="bg-white border rounded-xl shadow hover:shadow-md transition p-4 flex flex-col"
                             >
                                 {product.image && (
                                     <img
-                                        src={`${BACKEND_URL}/${product.image}`}
+                                        src={toAssetUrl(product.image)!}
                                         alt={product.name}
                                         className="w-full h-48 object-cover rounded-md mb-3"
                                     />

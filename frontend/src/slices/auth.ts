@@ -1,4 +1,3 @@
-// frontend/src/slices/auth.ts
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { setMessage } from "./message";
 import AuthService, { User, AuthResponse } from "../services/auth.service";
@@ -8,12 +7,8 @@ interface AuthState {
   user: User | null;
 }
 
-const initialState: AuthState = {
-  isLoggedIn: false,   // <- всегда гость на старте (и на сервере, и на клиенте)
-  user: null,
-};
+const initialState: AuthState = { isLoggedIn: false, user: null };
 
-// Гидратация из localStorage ТОЛЬКО на клиенте, после монтирования
 export const hydrateAuthFromStorage = createAsyncThunk<User | null>(
   "auth/hydrate",
   async () => {
@@ -29,10 +24,7 @@ export const hydrateAuthFromStorage = createAsyncThunk<User | null>(
 
 export const register = createAsyncThunk(
   "auth/register",
-  async (
-    { username, email, password }: { username: string; email: string; password: string },
-    { dispatch, rejectWithValue }: any
-  ): Promise<AuthResponse> => {
+  async ({ username, email, password }: { username: string; email: string; password: string }, { dispatch, rejectWithValue }: any): Promise<AuthResponse> => {
     try {
       const response = await AuthService.register(username, email, password);
       dispatch(setMessage(response.message));
@@ -47,15 +39,10 @@ export const register = createAsyncThunk(
 
 export const login = createAsyncThunk(
   "auth/login",
-  async (
-    { username, password }: { username: string; password: string },
-    { dispatch, rejectWithValue }: any
-  ): Promise<{ user: User }> => {
+  async ({ username, password }: { username: string; password: string }, { dispatch, rejectWithValue }: any): Promise<{ user: User }> => {
     try {
       const data = await AuthService.login(username, password);
-      if (typeof window !== "undefined") {
-        localStorage.setItem("user", JSON.stringify(data));
-      }
+      if (typeof window !== "undefined") localStorage.setItem("user", JSON.stringify(data));
       return { user: data as User };
     } catch (err: any) {
       const message = err?.response?.data?.message || "Login failed";
@@ -67,9 +54,7 @@ export const login = createAsyncThunk(
 
 export const logout = createAsyncThunk("auth/logout", async () => {
   await AuthService.logout();
-  if (typeof window !== "undefined") {
-    localStorage.removeItem("user");
-  }
+  if (typeof window !== "undefined") localStorage.removeItem("user");
 });
 
 export const refreshToken = createAsyncThunk(
@@ -77,10 +62,7 @@ export const refreshToken = createAsyncThunk(
   async (_: void, { dispatch, rejectWithValue }: any): Promise<{ accessToken: string; refreshToken: string }> => {
     try {
       const data = await AuthService.refreshToken();
-      return {
-        accessToken: data!.accessToken!,
-        refreshToken: data!.refreshToken!,
-      };
+      return { accessToken: data!.accessToken!, refreshToken: data!.refreshToken! };
     } catch (err: any) {
       const message = err?.response?.data?.message || "Token refresh failed";
       dispatch(setMessage(message));
@@ -89,44 +71,27 @@ export const refreshToken = createAsyncThunk(
   }
 );
 
-const authSlice = createSlice({
+const slice = createSlice({
   name: "auth",
   initialState,
   reducers: {},
-  extraReducers: (builder) => {
-    builder
-      .addCase(hydrateAuthFromStorage.fulfilled, (state, action: PayloadAction<User | null>) => {
-        state.user = action.payload;
-        state.isLoggedIn = !!action.payload;
-      })
-      .addCase(register.fulfilled, (state) => {
-        state.isLoggedIn = false;
-      })
-      .addCase(register.rejected, (state) => {
-        state.isLoggedIn = false;
-      })
-      .addCase(login.fulfilled, (state, action: PayloadAction<{ user: User }>) => {
-        state.isLoggedIn = true;
-        state.user = action.payload.user;
-      })
-      .addCase(login.rejected, (state) => {
-        state.isLoggedIn = false;
-        state.user = null;
-      })
-      .addCase(logout.fulfilled, (state) => {
-        state.isLoggedIn = false;
-        state.user = null;
-      })
-      .addCase(refreshToken.fulfilled, (state, action: PayloadAction<{ accessToken: string; refreshToken: string }>) => {
-        if (state.user) {
-          state.user.accessToken = action.payload.accessToken;
-          state.user.refreshToken = action.payload.refreshToken;
-          if (typeof window !== "undefined") {
-            localStorage.setItem("user", JSON.stringify(state.user));
-          }
-        }
-      });
+  extraReducers: (b) => {
+    b.addCase(hydrateAuthFromStorage.fulfilled, (state, { payload }) => {
+      state.user = payload; state.isLoggedIn = !!payload;
+    });
+    b.addCase(register.fulfilled, (s) => { s.isLoggedIn = false; });
+    b.addCase(register.rejected, (s) => { s.isLoggedIn = false; });
+    b.addCase(login.fulfilled, (s, { payload }) => { s.isLoggedIn = true; s.user = payload.user; });
+    b.addCase(login.rejected, (s) => { s.isLoggedIn = false; s.user = null; });
+    b.addCase(logout.fulfilled, (s) => { s.isLoggedIn = false; s.user = null; });
+    b.addCase(refreshToken.fulfilled, (s, { payload }) => {
+      if (s.user) {
+        s.user.accessToken = payload.accessToken;
+        s.user.refreshToken = payload.refreshToken;
+        if (typeof window !== "undefined") localStorage.setItem("user", JSON.stringify(s.user));
+      }
+    });
   },
 });
 
-export default authSlice.reducer;
+export default slice.reducer;

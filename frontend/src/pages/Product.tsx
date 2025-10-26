@@ -8,8 +8,8 @@ import {
     deleteProduct,
     clearMessage,
 } from "../slices/productSlice";
-import { RootState, AppDispatch } from "../store.ts";
-import { BACKEND_URL } from "../helpers/backendURL.ts";
+import { RootState, AppDispatch } from "../store";
+import { toAssetUrl } from "../helpers/url";
 
 interface ProductForm {
     name: string;
@@ -185,7 +185,7 @@ function ProductEdit() {
                 <label className="block font-medium mb-1">Image</label>
                 {previewImage && (
                     <img
-                        src={previewImage.startsWith("blob") ? previewImage : `${BACKEND_URL}/${previewImage}`}
+                        src={previewImage.startsWith("blob") ? previewImage : toAssetUrl(previewImage)!}
                         alt="preview"
                         className="mb-2 w-full h-48 object-cover rounded-xl shadow"
                     />
