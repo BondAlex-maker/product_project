@@ -1,0 +1,17 @@
+# Только для разработки
+FROM node:22-bullseye
+WORKDIR /app
+
+# Установим зависимости root и frontend (без копирования кода — быстрее)
+COPY package*.json ./
+COPY frontend/package*.json ./frontend/
+RUN npm ci && cd frontend && npm ci
+
+# Глобально установим nodemon для сервера (или используй локально через npx)
+RUN npm i -g nodemon
+
+# Откроем порты: 5174 (сервер), 5173 (vite)
+EXPOSE 5174 5173
+
+# По умолчанию — ничего, команду зададим в compose
+CMD ["bash"]

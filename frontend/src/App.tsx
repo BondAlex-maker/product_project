@@ -1,6 +1,7 @@
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, Link, Navigate, Navigate } from "react-router-dom";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import ProductsList from "./pages/ProductsList";
 import Product from "./pages/Product";
 import Login from "./components/Login";
@@ -20,6 +21,7 @@ function App() {
   const { user: currentUser } = useSelector((state: RootState) => state.auth);
 
   const isHydrated = useHydrated();
+  const navigate = useNavigate();
 
   // Делаем вычисления ролей только на клиенте (после гидратации)
   const { showModeratorBoard, showAdminBoard } = useMemo(() => {
@@ -34,8 +36,11 @@ function App() {
   }, [isHydrated, currentUser]);
 
   const logOut = useCallback(() => {
-    dispatch(logout());
-  }, [dispatch]);
+    dispatch(logout() as any)
+      .finally(() => {
+        navigate("/", { replace: true });
+      });
+  }, [dispatch, navigate]);
 
   // (опционально) если у тебя где-то был побочный эффект ролей — оставь:
   useEffect(() => {
@@ -96,7 +101,8 @@ function App() {
                 </Link>
                 <button
                   onClick={logOut}
-                  className="hover:text-gray-200 font-medium"
+                  className="hover:text-gray-200 font-medium cursor-pointer"
+                  style={{ cursor: "pointer" }}
                 >
                   LogOut
                 </button>
@@ -124,12 +130,13 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/user" element={<BoardUser />} />
-          <Route path="/mod" element={<BoardModerator />} />
-          <Route path="/admin" element={<BoardAdmin />} />
+          <Route path="/admin" element={currentUser ? <BoardAdmin /> : <Navigate to="/login" replace />} />
+            <Route path="/mod"   element={currentUser ? <BoardModerator /> : <Navigate to="/login" replace />} />
+            <Route path="/user"  element={currentUser ? <BoardUser /> : <Navigate to="/login" replace />} />
+            <Route path="/products/edit/:id"
+                element={currentUser?.roles?.includes("ROLE_ADMIN") ? <Product /> : <Navigate to="/" replace />} />
           <Route path="/products/common" element={<ProductsList />} />
           <Route path="/products/alcohol" element={<ProductsList />} />
-          <Route path="/products/edit/:id" element={<Product />} />
         </Routes>
       </main>
     </div>

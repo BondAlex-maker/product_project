@@ -1,0 +1,39 @@
+openapi: 3.0.3
+info:
+  title: Product Project API
+  version: 1.0.0
+servers:
+  - url: /api
+paths:
+  /auth/signin:
+    post:
+      summary: Sign in
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username: { type: string }
+                password: { type: string }
+      responses: { '200': { description: OK } }
+  /products/common:
+    get:
+      summary: List common products
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer, default: 0 }
+        - in: query
+          name: size
+          schema: { type: integer, default: 6 }
+        - in: query
+          name: name
+          schema: { type: string }
+      responses: { '200': { description: OK } }
+  /products/alcohol:
+    get:
+      summary: List alcohol products
+      responses: { '200': { description: OK } }

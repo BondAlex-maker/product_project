@@ -53,9 +53,15 @@ export const login = createAsyncThunk(
 );
 
 export const logout = createAsyncThunk("auth/logout", async () => {
-  await AuthService.logout();
-  if (typeof window !== "undefined") localStorage.removeItem("user");
-});
+    try {
+      await AuthService.logout();        // можно вызывать, но ошибки игнорируем
+    } catch {
+      /* ignore */
+    } finally {
+      if (typeof window !== "undefined") localStorage.removeItem("user");
+    }
+    return true; // <— важно: чтобы был fulfilled
+  });
 
 export const refreshToken = createAsyncThunk(
   "auth/refreshToken",
@@ -83,7 +89,9 @@ const slice = createSlice({
     b.addCase(register.rejected, (s) => { s.isLoggedIn = false; });
     b.addCase(login.fulfilled, (s, { payload }) => { s.isLoggedIn = true; s.user = payload.user; });
     b.addCase(login.rejected, (s) => { s.isLoggedIn = false; s.user = null; });
+    b.addCase(logout.pending,   (s) => { s.isLoggedIn = false; s.user = null; });
     b.addCase(logout.fulfilled, (s) => { s.isLoggedIn = false; s.user = null; });
+    b.addCase(logout.rejected,  (s) => { s.isLoggedIn = false; s.user = null; });
     b.addCase(refreshToken.fulfilled, (s, { payload }) => {
       if (s.user) {
         s.user.accessToken = payload.accessToken;

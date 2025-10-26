@@ -3,17 +3,19 @@
   "version": "1.0.0",
   "description": "Jelly Inc",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "dev:client": "vite --config ./frontend/vite.config.js",
     "build:client": "vite build --config ./frontend/vite.config.js",
     "build:ssr": "vite build --config ./frontend/vite.config.ssr.js",
     "build": "npm run build:client && npm run build:ssr && node ./scripts/prerender.mjs",
-    "serve": "node ./server.js"
+    "serve": "node ./server.js",
+    "test": "vitest run",
+    "test:api": "vitest run -c vitest.api.config.ts"
   },
   "keywords": [],
   "author": "bondalex-maker",
   "license": "ISC",
-  "type": "module",
   "dependencies": {
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
@@ -24,10 +26,26 @@
     "pg": "^8.16.3",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.7",
-    "uuid": "^13.0.0"
+    "swagger-ui-express": "^5.0.1",
+    "uuid": "^13.0.0",
+    "yamljs": "^0.3.0",
+    "formik": "^2.4.6",
+    "yup": "^1.7.1",
+
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-router-dom": "^7.9.4",
+    "react-redux": "^9.2.0",
+    "@reduxjs/toolkit": "^2.9.1",
+    "axios": "^1.12.2"
   },
   "devDependencies": {
     "@types/node": "^20.19.23",
-    "vite": "^7.1.11"
+    "@types/supertest": "^2.0.16",
+    "@vitest/ui": "^2.0.0",
+    "supertest": "^7.0.0",
+    "typescript": "^5.6.0",
+    "vite": "^7.1.11",
+    "vitest": "^2.0.0"
   }
 }
