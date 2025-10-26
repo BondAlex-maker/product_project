@@ -17,41 +17,26 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static(path.join(process.cwd(), "app/storage/uploads")));
+app.use(express.static("frontend/dist/client"));
 
-// Simple route
-app.get("/", (req, res) => {
-    res.json({ message: "Welcome to the Product Application." });
-});
-
-// Routes
+// API
 productRoutes(app);
 authRoutes(app);
 userRoutes(app);
 
-// Sync database
-db.sequelize.sync({alter: true}).then(() => {
+// SSR must be last
+app.get("*", async (req, res) => {
+    const { render } = await import("./frontend/dist/server/entry-server.js");
+    const html = await render(req.url);
+    res.status(200).set({ "Content-Type": "text/html" }).end(html);
+});
+
+// DB
+db.sequelize.sync({ alter: true }).then(() => {
     console.log("Synced db.");
-    // initial();
 });
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}.`);
+    console.log(`Server running http://localhost:${PORT}`);
 });
-
-// function initial() {
-//     Role.create({
-//         id: 1,
-//         name: "user"
-//     });
-//
-//     Role.create({
-//         id: 2,
-//         name: "moderator"
-//     });
-//
-//     Role.create({
-//         id: 3,
-//         name: "admin"
-//     });
-// }

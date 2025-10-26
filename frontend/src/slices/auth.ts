@@ -2,8 +2,9 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { setMessage } from "./message";
 import AuthService, { User, AuthResponse } from "../services/auth.service";
 
-// Получаем пользователя из localStorage
+// Получаем пользователя из localStorage (только на клиенте)
 const user: User | null = (() => {
+    if (typeof window === "undefined") return null; // SSR FIX ✅
     const u = localStorage.getItem("user");
     if (!u) return null;
     try {

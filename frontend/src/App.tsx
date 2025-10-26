@@ -1,4 +1,4 @@
-import { Routes, Route, Link, BrowserRouter } from "react-router-dom";
+import { Routes, Route, Link } from "react-router-dom";
 import { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ProductsList from "./pages/ProductsList";
@@ -31,7 +31,6 @@ function App() {
     }, [currentUser]);
 
     return (
-        <BrowserRouter>
             <div className="min-h-screen flex flex-col">
                 {/* NAVBAR */}
                 <nav className="bg-blue-600 text-white p-4 shadow">
@@ -88,7 +87,6 @@ function App() {
                     </Routes>
                 </main>
             </div>
-        </BrowserRouter>
     );
 }
 

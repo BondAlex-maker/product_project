@@ -4,11 +4,11 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [
-      react(),
-    tailwindcss(),
-  ],
+    plugins: [react(), tailwindcss()],
     build: {
-        ssr: true,
+        outDir: "dist/client",
+        rollupOptions: {
+            input: "src/main.tsx",
+        },
     },
-})
+});

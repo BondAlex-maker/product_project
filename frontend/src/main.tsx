@@ -1,13 +1,17 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 import App from "./App";
 import { store } from "./store.ts";
 import { Provider } from "react-redux";
-import setupInterceptors from "./services/setupInterceptors";
 
-// Настраиваем axios interceptors с типизированным store
-setupInterceptors(store);
+// ✅ Ленивый импорт interceptors, чтобы SSR не трогал TokenService
+if (typeof window !== "undefined") {
+    import("./services/setupInterceptors").then(({ default: setupInterceptors }) => {
+        setupInterceptors(store);
+    });
+}
 
 const container = document.getElementById("root");
 if (!container) throw new Error("Root container missing in index.html");
@@ -15,7 +19,9 @@ if (!container) throw new Error("Root container missing in index.html");
 createRoot(container).render(
     <StrictMode>
         <Provider store={store}>
-            <App />
+            <BrowserRouter>
+                <App />
+            </BrowserRouter>
         </Provider>
     </StrictMode>
 );

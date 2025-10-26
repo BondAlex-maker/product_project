@@ -55,6 +55,7 @@ class AuthService {
     }
 
     getCurrentUser(): User | null {
+        if (typeof window === "undefined") return null; // ✅ SSR FIX
         return TokenService.getUser();
     }
 }
