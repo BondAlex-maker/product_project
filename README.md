@@ -4,9 +4,9 @@ Full-stack React + Node.js application with PostgreSQL, JWT authentication, and 
 
 ## 🚀 Demo & Production
 <!-- Deployment in progress — live demo will be available soon -->
-- **Production**: https://your-domain.com
-- **API Documentation**: https://your-domain.com/api/docs
-- **Demo Server**: Not deployed yet
+- **Demo**: https://product-project-g47t.onrender.com
+- **API Documentation**: https://product-project-g47t.onrender.com/api/docs/
+<!-- - **Demo Server**: https://product-project-g47t.onrender.com -->
 
 ## 👥 Access Credentials
 
