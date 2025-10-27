@@ -1,8 +1,8 @@
 import axios, { AxiosRequestConfig } from "axios";
 
 const config: AxiosRequestConfig = {
-  baseURL: "/api",            // ⬅️ больше НЕ http://localhost:8080
-  withCredentials: true,      // оставь true, если используешь cookies/refresh
+  baseURL: "/api",           
+  withCredentials: true,     
   headers: { "Content-Type": "application/json" },
 };
 

@@ -6,7 +6,6 @@ import App from "./App";
 import { store } from "./store";
 import { Provider } from "react-redux";
 
-// ✅ Ленивый импорт interceptors, чтобы SSR не трогал TokenService
 if (typeof window !== "undefined") {
     import("./services/setupInterceptors").then(({ default: setupInterceptors }) => {
         setupInterceptors(store);

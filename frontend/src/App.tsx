@@ -23,7 +23,6 @@ function App() {
   const isHydrated = useHydrated();
   const navigate = useNavigate();
 
-  // Делаем вычисления ролей только на клиенте (после гидратации)
   const { showModeratorBoard, showAdminBoard } = useMemo(() => {
     if (!isHydrated || !currentUser?.roles) {
       return { showModeratorBoard: false, showAdminBoard: false };
@@ -42,17 +41,13 @@ function App() {
       });
   }, [dispatch, navigate]);
 
-  // (опционально) если у тебя где-то был побочный эффект ролей — оставь:
   useEffect(() => {
-    // без изменения DOM до гидратации
   }, [showModeratorBoard, showAdminBoard]);
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* NAVBAR */}
       <nav className="bg-blue-600 text-white p-4 shadow">
         <div className="container mx-auto flex flex-wrap justify-between items-center">
-          {/* Левая часть навбара */}
           <div className="flex flex-wrap items-center space-x-4">
             <Link to="/" className="font-bold text-lg hover:text-gray-200">
               Public Page
@@ -61,7 +56,6 @@ function App() {
               Home
             </Link>
 
-            {/* Ролевые пункты — только после гидратации */}
             {isHydrated && showModeratorBoard && (
               <Link to="/mod" className="hover:text-gray-200">
                 Moderator Board
@@ -77,7 +71,6 @@ function App() {
                 </Link>
               </>
             )}
-            {/* USER тоже зависит от авторизации */}
             {isHydrated && currentUser && (
               <Link to="/user" className="hover:text-gray-200">
                 User
@@ -92,7 +85,6 @@ function App() {
             </Link>
           </div>
 
-          {/* Правая часть навбара */}
           <div className="flex flex-wrap items-center space-x-4 mt-2 sm:mt-0">
             {isHydrated && currentUser ? (
               <>
@@ -108,7 +100,6 @@ function App() {
                 </button>
               </>
             ) : (
-              // Пока не гидратировались — показываем гость-версию
               <>
                 <Link to="/login" className="hover:text-gray-200 font-medium">
                   Login
@@ -122,7 +113,6 @@ function App() {
         </div>
       </nav>
 
-      {/* ROUTES */}
       <main className="flex-1 container mx-auto mt-8 px-4">
         <Routes>
           <Route path="/" element={<Home />} />

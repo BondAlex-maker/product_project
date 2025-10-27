@@ -1,11 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-// Тип состояния
 interface MessageState {
     message: string;
 }
 
-// Начальное состояние
 const initialState: MessageState = {
     message: "",
 };

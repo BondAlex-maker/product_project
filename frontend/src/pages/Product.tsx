@@ -42,7 +42,6 @@ function ProductEdit() {
 
     const [previewImage, setPreviewImage] = useState<string | null>(null);
 
-    // Fetch product on load if editing
     useEffect(() => {
         if (!isNew && id) dispatch(fetchProductById(id));
         else {
@@ -60,7 +59,6 @@ function ProductEdit() {
         }
     }, [dispatch, id, isNew]);
 
-    // Populate form when currentProduct is loaded
     useEffect(() => {
         if (currentProduct && !isNew) {
             setForm({
@@ -108,7 +106,6 @@ function ProductEdit() {
                 {isNew ? "Add Product" : "Edit Product"}
             </h4>
 
-            {/* Name */}
             <div className="mb-4">
                 <label className="block font-medium mb-1">Name</label>
                 <input
@@ -120,7 +117,6 @@ function ProductEdit() {
                 />
             </div>
 
-            {/* Description */}
             <div className="mb-4">
                 <label className="block font-medium mb-1">Description</label>
                 <textarea
@@ -131,7 +127,6 @@ function ProductEdit() {
                 />
             </div>
 
-            {/* Ingredients */}
             <div className="mb-4">
                 <label className="block font-medium mb-1">Ingredients</label>
                 <textarea
@@ -142,7 +137,6 @@ function ProductEdit() {
                 />
             </div>
 
-            {/* Type */}
             <div className="mb-4">
                 <label className="block font-medium mb-1">Type</label>
                 <select
@@ -156,7 +150,6 @@ function ProductEdit() {
                 </select>
             </div>
 
-            {/* Prices */}
             <div className="flex gap-4 mb-4">
                 <div className="flex-1">
                     <label className="block font-medium mb-1">Price</label>
@@ -180,7 +173,6 @@ function ProductEdit() {
                 </div>
             </div>
 
-            {/* Image */}
             <div className="mb-4">
                 <label className="block font-medium mb-1">Image</label>
                 {previewImage && (
@@ -198,7 +190,6 @@ function ProductEdit() {
                 />
             </div>
 
-            {/* Buttons */}
             <div className="flex gap-3 mt-4">
                 {!isNew && (
                     <button

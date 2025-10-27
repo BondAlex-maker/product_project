@@ -71,7 +71,6 @@ const Login: React.FC = () => {
                 >
                     {({ errors, touched }) => (
                         <Form className="space-y-6">
-                            {/* Username */}
                             <div>
                                 <label htmlFor="username" className="block text-gray-700 font-medium mb-2">
                                     Username
@@ -90,7 +89,6 @@ const Login: React.FC = () => {
                                 />
                             </div>
 
-                            {/* Password */}
                             <div>
                                 <label htmlFor="password" className="block text-gray-700 font-medium mb-2">
                                     Password
@@ -109,7 +107,6 @@ const Login: React.FC = () => {
                                 />
                             </div>
 
-                            {/* Submit Button */}
                             <div>
                                 <button
                                     type="submit"
@@ -145,7 +142,6 @@ const Login: React.FC = () => {
                     )}
                 </Formik>
 
-                {/* Message */}
                 {message && (
                     <div className="mt-4">
                         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded" role="alert">

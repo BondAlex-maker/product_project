@@ -66,7 +66,6 @@ function ProductsList() {
     return (
         <div className="p-6 bg-gray-50 min-h-screen">
             <div className="max-w-6xl mx-auto">
-                {/* Заголовок и поиск */}
                 <div className="flex flex-col sm:flex-row justify-between items-center mb-6 space-y-3 sm:space-y-0">
                     <h2 className="text-2xl font-bold">
                         {location.pathname.includes("/alcohol") ? "Alcohol Products" : "Common Products"}
@@ -89,10 +88,8 @@ function ProductsList() {
                     </div>
                 </div>
 
-                {/* Загрузка */}
                 {loading && <p className="text-center text-gray-500">Loading...</p>}
 
-                {/* Список продуктов */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {products.length > 0 ? (
                         products.map((product: Product) => (
@@ -136,7 +133,6 @@ function ProductsList() {
                     )}
                 </div>
 
-                {/* Pagination */}
                 {totalPages > 1 && (
                     <div className="flex justify-center mt-8 space-x-2">
                         {Array.from({ length: totalPages }).map((_, i) => (

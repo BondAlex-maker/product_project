@@ -28,7 +28,6 @@ class TokenService {
     }
 
     getUser(): User | null {
-        // ✅ SSR защита
         if (typeof window === "undefined") return null;
 
         const userString = localStorage.getItem("user");
@@ -44,14 +43,12 @@ class TokenService {
     }
 
     setUser(user: User): void {
-        // ✅ SSR защита
         if (typeof window === "undefined") return;
 
         localStorage.setItem("user", JSON.stringify(user));
     }
 
     removeUser(): void {
-        // ✅ SSR защита
         if (typeof window === "undefined") return;
 
         localStorage.removeItem("user");

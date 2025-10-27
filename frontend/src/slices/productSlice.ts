@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import ProductService, { Product } from "../services/product.service";
 
-// === TYPES ===
 
 interface ProductState {
     list: Product[];
@@ -24,9 +23,6 @@ interface UpdateProductArgs {
     formData: FormData;
 }
 
-// === ASYNC THUNKS ===
-
-// get all common products
 export const fetchCommonProducts = createAsyncThunk(
     "products/fetchCommon",
     async ({ page, limit, name }: FetchProductsArgs, { rejectWithValue }: any): Promise<Product[]> => {
@@ -39,7 +35,6 @@ export const fetchCommonProducts = createAsyncThunk(
     }
 );
 
-// get all alcohol products
 export const fetchAlcoholProducts = createAsyncThunk(
     "products/fetchAlcohol",
     async ({ page, limit, name }: FetchProductsArgs, { rejectWithValue }: any): Promise<Product[]> => {
@@ -52,7 +47,6 @@ export const fetchAlcoholProducts = createAsyncThunk(
     }
 );
 
-// get single product
 export const fetchProductById = createAsyncThunk(
     "products/fetchById",
     async (id: number | string, { rejectWithValue }: any): Promise<Product> => {
@@ -65,7 +59,6 @@ export const fetchProductById = createAsyncThunk(
     }
 );
 
-// create product
 export const createProduct = createAsyncThunk(
     "products/create",
     async (formData: FormData, { rejectWithValue }: any): Promise<Product> => {
@@ -78,7 +71,6 @@ export const createProduct = createAsyncThunk(
     }
 );
 
-// update product
 export const updateProduct = createAsyncThunk(
     "products/update",
     async ({ id, formData }: UpdateProductArgs, { rejectWithValue }: any): Promise<UpdateProductArgs> => {
@@ -91,7 +83,6 @@ export const updateProduct = createAsyncThunk(
     }
 );
 
-// delete product
 export const deleteProduct = createAsyncThunk(
     "products/delete",
     async (id: number | string, { rejectWithValue }: any): Promise<number | string> => {
@@ -104,7 +95,6 @@ export const deleteProduct = createAsyncThunk(
     }
 );
 
-// === INITIAL STATE ===
 
 const initialState: ProductState = {
     list: [],
@@ -116,7 +106,6 @@ const initialState: ProductState = {
     message: null,
 };
 
-// === SLICE ===
 
 const productSlice = createSlice({
     name: "products",
@@ -129,7 +118,6 @@ const productSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            // Common products
             .addCase(fetchCommonProducts.pending, (state) => {
                 state.loading = true;
             })
@@ -142,7 +130,6 @@ const productSlice = createSlice({
                 state.error = action.payload;
             })
 
-            // Alcohol products
             .addCase(fetchAlcoholProducts.pending, (state) => {
                 state.loading = true;
             })
@@ -155,23 +142,19 @@ const productSlice = createSlice({
                 state.error = action.payload;
             })
 
-            // Single product
             .addCase(fetchProductById.fulfilled, (state, action: PayloadAction<Product>) => {
                 state.currentProduct = action.payload;
             })
 
-            // Create
             .addCase(createProduct.fulfilled, (state, action: PayloadAction<Product>) => {
                 state.message = "Product created successfully!";
                 state.list.push(action.payload);
             })
 
-            // Update
             .addCase(updateProduct.fulfilled, (state) => {
                 state.message = "Product updated successfully!";
             })
 
-            // Delete
             .addCase(deleteProduct.fulfilled, (state, action: PayloadAction<number | string>) => {
                 state.message = "Product deleted successfully!";
                 state.list = state.list.filter((p) => p.id !== action.payload);

@@ -36,7 +36,7 @@ const setupInterceptors = (store: Store) => {
                     originalConfig._retry = true;
 
                     try {
-                        const result = await dispatch(refreshToken() as any); // thunk result
+                        const result = await dispatch(refreshToken() as any);
                         const { accessToken, refreshToken: newRefreshToken } = result.payload;
 
                         TokenService.updateLocalAccessToken(accessToken);

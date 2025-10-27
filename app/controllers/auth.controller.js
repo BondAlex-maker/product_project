@@ -10,17 +10,14 @@ const Op = db.Sequelize.Op;
 
 export const signup = async (req, res) => {
     try {
-        // Hash password
         const hashedPassword = bcrypt.hashSync(req.body.password, 8);
 
-        // Create user
         const user = await User.create({
             username: req.body.username,
             email: req.body.email,
             password: hashedPassword
         });
 
-        // Assign roles
         if (req.body.roles) {
             const roles = await Role.findAll({
                 where: {
@@ -31,7 +28,6 @@ export const signup = async (req, res) => {
             });
             await user.setRoles(roles);
         } else {
-            // default role = 3 admin
             await user.setRoles([3]);
         }
 
@@ -44,7 +40,7 @@ export const signup = async (req, res) => {
 export const signin = async (req, res) => {
     try {
         const user = await User.findOne({
-            where: { username: req.body.username }
+            where: { username: req.body.username.toLowerCase() }
         });
 
         if (!user) {
@@ -61,21 +57,18 @@ export const signin = async (req, res) => {
             });
         }
 
-        // Generate JWT token
         const token = jwt.sign(
             { id: user.id },
             config.secret,
             {
                 algorithm: "HS256",
                 allowInsecureKeySizes: true,
-                // expiresIn: 86400 // 24 hours
-                expiresIn: config.jwtExpiration // 1 hours
+                expiresIn: config.jwtExpiration
             }
         );
 
         let refreshToken = await RefreshToken.createToken(user);
 
-        // Get roles
         const roles = await user.getRoles();
         const authorities = roles.map(role => "ROLE_" + role.name.toUpperCase());
 
@@ -116,7 +109,6 @@ export const refreshToken = async (req, res) => {
 
         const user = await refreshToken.getUser();
 
-        // Генерируем новый access token
         const newAccessToken = jwt.sign({ id: user.id }, config.secret, {
             expiresIn: config.jwtExpiration,
         });

@@ -20,13 +20,11 @@ import BoardUser from "./components/BoardUser";
 import BoardModerator from "./components/BoardModerator";
 import BoardAdmin from "./components/BoardAdmin";
 
-// Redux типы и интерсепторы
 import type { RootState } from "./store";
 import setupInterceptors from "./services/setupInterceptors";
 import { hydrateAuthFromStorage } from "./slices/auth";
 import type { AppDispatch } from "./store";
 
-// ====== Компоненты-защиты (guards) ======
 
 type Role = "ROLE_USER" | "ROLE_MODERATOR" | "ROLE_ADMIN";
 
@@ -39,10 +37,6 @@ function hasRole(user: any, roles: Role[]) {
   return roles.some((r) => userRoles.includes(r));
 }
 
-/**
- * Требует авторизацию (любой залогиненный пользователь).
- * Если не авторизован — редирект на /login.
- */
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const user = useSelector(selectCurrentUser);
   if (!user) {
@@ -51,10 +45,6 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-/**
- * Требует конкретные роли.
- * Если нет роли — редирект на / (или страницу 403, если сделаешь).
- */
 function RequireRoles({
   roles,
   children,
@@ -68,17 +58,10 @@ function RequireRoles({
   return <>{children}</>;
 }
 
-/**
- * Одноразовая инициализация axios-интерсепторов с актуальным store.
- * Работает и в SSR: берёт store из текущего Provider через useStore().
- * На сервере вызов в useEffect не выполнится, что корректно.
- */
 function InterceptorsBootstrap() {
   const store = useStore();
   useEffect(() => {
-    // Инициализируем перехватчики запросов/ответов
-    // (автоподстановка токена, логаут по 401 и т.п.)
-    // setupInterceptors должен уметь работать, получая store как аргумент
+
     setupInterceptors(store as any);
     (store as any as { dispatch: AppDispatch }).dispatch(hydrateAuthFromStorage());
   }, [store]);

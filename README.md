@@ -3,14 +3,14 @@
 Full-stack React + Node.js application with PostgreSQL, JWT authentication, and SSR.
 
 ## 🚀 Demo & Production
-
+<!-- Deployment in progress — live demo will be available soon -->
 - **Production**: https://your-domain.com
 - **API Documentation**: https://your-domain.com/api/docs
 - **Demo Server**: Not deployed yet
 
 ## 👥 Access Credentials
 
-### Admin
+### Admin OR /register
 - **Username**: `admin`
 - **Email**: `admin@example.com`
 - **Password**: `admin123`
@@ -19,7 +19,18 @@ Full-stack React + Node.js application with PostgreSQL, JWT authentication, and 
 *Contact administrator to create moderator account*
 
 ### User
-*Register via `/register` page or contact administrator*
+*Contact administrator to create user account*
+
+## 🧱 Architecture
+- **Backend**: layered (routes → controllers → services → models)
+- **Frontend**: feature-sliced with Redux Toolkit
+- **Auth flow**: access + refresh tokens (httpOnly) with role-based guards
+
+## 🔮 Roadmap
+- [ ] Pagination + filtering on SSR pages
+- [ ] Image CDN + caching headers
+- [ ] Email notifications
+- [ ] Upload to S3/Cloudinary
 
 ## ✨ Features
 
@@ -27,7 +38,7 @@ Full-stack React + Node.js application with PostgreSQL, JWT authentication, and 
 - 👤 Role-based access control (Admin, Moderator, User)
 - 📦 Product management with image uploads
 - 🍺 Alcohol products listing
-- 🎨 Server-side rendering (SSR) with React
+- ⚡ SSR + partial SSG for better SEO and faster first paint
 - 📱 Responsive UI with Tailwind CSS
 - 🧪 API testing with Vitest & Supertest
 - 📚 OpenAPI/Swagger documentation

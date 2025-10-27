@@ -3,8 +3,8 @@ export default (sequelize, Sequelize) => {
         username: {
             type: Sequelize.STRING,
             allowNull: false,
-            unique: true,             // оставляем, но см. уникальный индекс ниже
-            set(value) {              // <-- принудительно в нижний регистр
+            unique: true,             
+            set(value) {             
             this.setDataValue("username", String(value).toLowerCase());
             },
         },

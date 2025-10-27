@@ -54,13 +54,13 @@ export const login = createAsyncThunk(
 
 export const logout = createAsyncThunk("auth/logout", async () => {
     try {
-      await AuthService.logout();        // можно вызывать, но ошибки игнорируем
+      await AuthService.logout();      
     } catch {
       /* ignore */
     } finally {
       if (typeof window !== "undefined") localStorage.removeItem("user");
     }
-    return true; // <— важно: чтобы был fulfilled
+    return true;
   });
 
 export const refreshToken = createAsyncThunk(

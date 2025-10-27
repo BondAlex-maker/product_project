@@ -11,7 +11,6 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// читаем manifest из клиентского билда
 const manifest = JSON.parse(
   fs.readFileSync(path.resolve(__dirname, "../dist/.vite/manifest.json"), "utf-8")
 );

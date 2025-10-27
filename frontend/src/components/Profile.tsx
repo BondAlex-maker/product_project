@@ -3,7 +3,6 @@ import { Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../store.ts";
 
-// Тип для пользователя
 interface User {
     id: number | string;
     username: string;

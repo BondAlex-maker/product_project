@@ -3,7 +3,7 @@ import { AxiosResponse } from "axios";
 
 export interface PublicContent {
     message: string;
-    [key: string]: any; // на случай других полей
+    [key: string]: any;
 }
 
 class UserService {

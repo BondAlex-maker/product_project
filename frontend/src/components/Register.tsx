@@ -80,7 +80,6 @@ const Register: React.FC = () => {
                         <Form className="space-y-6">
                             {!successful && (
                                 <>
-                                    {/* Username */}
                                     <div>
                                         <label
                                             htmlFor="username"
@@ -105,7 +104,6 @@ const Register: React.FC = () => {
                                         />
                                     </div>
 
-                                    {/* Email */}
                                     <div>
                                         <label
                                             htmlFor="email"
@@ -130,7 +128,6 @@ const Register: React.FC = () => {
                                         />
                                     </div>
 
-                                    {/* Password */}
                                     <div>
                                         <label
                                             htmlFor="password"
@@ -155,7 +152,6 @@ const Register: React.FC = () => {
                                         />
                                     </div>
 
-                                    {/* Submit Button */}
                                     <div>
                                         <button
                                             type="submit"
@@ -171,7 +167,6 @@ const Register: React.FC = () => {
                     )}
                 </Formik>
 
-                {/* Message */}
                 {message && (
                     <div className="mt-4">
                         <div

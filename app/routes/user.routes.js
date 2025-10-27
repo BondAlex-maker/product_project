@@ -2,7 +2,6 @@ import { authJwt } from "../middleware/index.js"; // adjust path if needed
 import * as controller from "../controllers/user.controller.js";
 
 export default function (app) {
-    // Set CORS headers for all requests to this route
     app.use((req, res, next) => {
         res.header(
             "Access-Control-Allow-Headers",
@@ -11,10 +10,8 @@ export default function (app) {
         next();
     });
 
-    // Public route
     app.get("/api/test/all", controller.allAccess);
 
-    // Protected routes
     app.get("/api/test/user", [authJwt.verifyToken], controller.userBoard);
 
     app.get(

@@ -2,7 +2,6 @@ import { verifySignUp } from "../middleware/index.js";
 import * as controller from "../controllers/auth.controller.js";
 
 export default function (app) {
-    // Set CORS headers for all requests to this route
     app.use((req, res, next) => {
         res.header(
             "Access-Control-Allow-Headers",
@@ -11,7 +10,6 @@ export default function (app) {
         next();
     });
 
-    // Signup route
     app.post(
         "/api/auth/signup",
         [
@@ -21,7 +19,6 @@ export default function (app) {
         controller.signup
     );
 
-    // Signin route
     app.post("/api/auth/signin", controller.signin);
 
     app.post("/api/auth/refreshtoken", controller.refreshToken);

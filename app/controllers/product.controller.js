@@ -16,7 +16,6 @@ const getPagingData = (data, page, limit) => {
     return { totalItems, products, totalPages, currentPage };
 };
 
-// Create and Save a new Product
 export const create = async (req, res) => {
     if (!req.body.name) {
         return res.status(400).send({ message: "Product name cannot be empty!" });
@@ -42,7 +41,6 @@ export const create = async (req, res) => {
     }
 };
 
-// Retrieve all Products
 export const findAll = async (req, res) => {
     const { page, size, name } = req.query;
     const condition = name ? { name: { [Op.iLike]: `%${name}%` } } : null;
@@ -59,7 +57,6 @@ export const findAll = async (req, res) => {
     }
 };
 
-// Find a single Product by ID
 export const findOne = async (req, res) => {
     const id = req.params.id;
 
@@ -72,12 +69,10 @@ export const findOne = async (req, res) => {
     }
 };
 
-// Update a Product by ID
 export const update = async (req, res) => {
     const id = req.params.id;
 
     try {
-        // Prepare updated fields (just like in `create`)
         const updatedFields = {
             name: req.body.name,
             description: req.body.description,
@@ -87,12 +82,10 @@ export const update = async (req, res) => {
             sale_price: req.body.sale_price ? parseFloat(req.body.sale_price) : null,
         };
 
-        // If a new image was uploaded, update the image path
         if (req.file) {
             updatedFields.image = `uploads/products/${req.file.filename}`;
         }
 
-        // Perform update
         const [num] = await Product.update(updatedFields, { where: { id } });
 
         if (num === 1) {
@@ -110,8 +103,6 @@ export const update = async (req, res) => {
     }
 };
 
-
-// Delete a Product by ID
 export const deleteOne = async (req, res) => {
     const id = req.params.id;
 
@@ -124,7 +115,6 @@ export const deleteOne = async (req, res) => {
     }
 };
 
-// Delete all Products
 export const deleteAll = async (req, res) => {
     try {
         const nums = await Product.destroy({ where: {}, truncate: false });

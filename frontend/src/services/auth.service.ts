@@ -15,7 +15,7 @@ export interface AuthResponse {
     refreshToken?: string;
     username?: string;
     email?: string;
-    [key: string]: any; // на случай других полей
+    [key: string]: any;
 }
 
 class AuthService {
@@ -28,7 +28,7 @@ class AuthService {
         const response: AxiosResponse<AuthResponse> = await api.post("/auth/signin", { username, password });
 
         if (response.data.accessToken) {
-            TokenService.setUser(response.data as User); // сохраняем user + токены
+            TokenService.setUser(response.data as User);
         }
 
         return response.data;
@@ -55,7 +55,7 @@ class AuthService {
     }
 
     getCurrentUser(): User | null {
-        if (typeof window === "undefined") return null; // ✅ SSR FIX
+        if (typeof window === "undefined") return null;
         return TokenService.getUser();
     }
 }
