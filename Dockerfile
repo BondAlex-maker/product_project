@@ -4,7 +4,8 @@ COPY package*.json ./
 COPY frontend/package*.json ./frontend/
 RUN npm ci && cd frontend && npm ci
 COPY . .
-RUN npm run build
+RUN npm run build && npm run build:ssr
+
 
 FROM node:22-alpine AS runtime
 WORKDIR /app
