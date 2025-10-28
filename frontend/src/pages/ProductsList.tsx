@@ -113,7 +113,18 @@ function ProductsList() {
                                     {product.ingredients || "No ingredients"}
                                 </p>
                                 <p className="font-bold mt-2">
-                                    ${product.sale_price ?? product.price ?? 0}
+                                    {product.sale_price && product.price ? (
+                                        <span className="flex flex-col">
+                                            <span className="line-through text-gray-400 text-sm">
+                                                ${product.price}
+                                            </span>
+                                            <span className="text-red-500">
+                                                ${product.sale_price}
+                                            </span>
+                                        </span>
+                                    ) : (
+                                        <>${product.sale_price ?? product.price ?? 0}</>
+                                    )}
                                 </p>
 
                                 {currentUser?.roles?.includes("ROLE_ADMIN") && (
