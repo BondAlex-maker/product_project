@@ -28,12 +28,18 @@ function ProductsList() {
 
     const [searchParams, setSearchParams] = useSearchParams();
     const [page, setPage] = useState<number>(Number(searchParams.get("page")) || 0);
-    const [limit] = useState<number>(Number(searchParams.get("limit")) || 3);
+    const [limit, setLimit] = useState<number>(Number(searchParams.get("limit")) || 3);
     const [nameInput, setNameInput] = useState<string>(searchParams.get("name") || "");
     const prevPathRef = useRef(location.pathname);
 
-    // Сбрасываем поиск при смене типа продукта
-    useEffect(() => {
+    const handleLimitChange = (e: ChangeEvent<HTMLSelectElement>) => {
+        const newLimit = Number(e.target.value);
+        setLimit(newLimit);
+        setPage(0);
+        setSearchParams({ page: "0", limit: String(newLimit), name: nameInput });
+      };
+
+      useEffect(() => {
         if (prevPathRef.current !== location.pathname) {
             setNameInput("");
             setPage(0);
@@ -42,7 +48,6 @@ function ProductsList() {
         prevPathRef.current = location.pathname;
     }, [location.pathname, setSearchParams]);
 
-    // Fetch products при изменении пути, страницы или поиска
     useEffect(() => {
         const params = { page, limit, name: searchParams.get("name") || "" };
         if (location.pathname.includes("/products/alcohol")) {
@@ -85,6 +90,14 @@ function ProductsList() {
                         >
                             Search
                         </button>
+                        <select
+                            value={limit}
+                            onChange={handleLimitChange}
+                            className="border rounded px-2 py-2">
+                            <option value={3}>3</option>
+                            <option value={6}>6</option>
+                            <option value={9}>9</option>
+                        </select>
                     </div>
                 </div>
 
@@ -100,7 +113,8 @@ function ProductsList() {
                             >
                                 {product.image && (
                                     <img
-                                        src={toAssetUrl(product.image)!}
+                                        // src={toAssetUrl(product.image)!}
+                                        src={'https://j6e2i8c9.delivery.rocketcdn.me/wp-content/uploads/2018/04/Vegan-Strawberry-Jelly-recipe-1.jpg.webp'}
                                         alt={product.name}
                                         className="w-full h-48 object-cover rounded-md mb-3"
                                     />
