@@ -18,24 +18,15 @@ export const signup = async (req, res) => {
             password: hashedPassword
         });
 
-        if (req.body.roles) {
-            const roles = await Role.findAll({
-                where: {
-                    name: {
-                        [Op.or]: req.body.roles
-                    }
-                }
-            });
-            await user.setRoles(roles);
-        } else {
-            await user.setRoles([3]);
-        }
+        await user.setRoles([1]);
 
         res.send({ message: "User was registered successfully!" });
     } catch (err) {
+        console.error(err);
         res.status(500).send({ message: err.message });
     }
 };
+
 
 export const signin = async (req, res) => {
     try {

@@ -10,15 +10,10 @@ Full-stack React + Node.js application with PostgreSQL, JWT authentication, and 
 
 ## 👥 Access Credentials
 
-### Admin OR /register
-- **Username**: `admin`
-- **Email**: `admin@example.com`
-- **Password**: `admin123`
+### Admin
+*Contact administrator to create admin account*
 
-### Moderator
-*Contact administrator to create moderator account*
-
-### User
+### User / Register
 *Contact administrator to create user account*
 
 ## 🧱 Architecture
