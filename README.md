@@ -14,7 +14,7 @@ Full-stack React + Node.js application with PostgreSQL, JWT authentication, and 
 *Contact administrator to create admin account*
 
 ### User / Register
-*Contact administrator to create user account*
+*Contact administrator to create user account or register*
 
 ## 🧱 Architecture
 - **Backend**: layered (routes → controllers → services → models)
