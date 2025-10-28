@@ -28,7 +28,7 @@ function ProductsList() {
 
     const [searchParams, setSearchParams] = useSearchParams();
     const [page, setPage] = useState<number>(Number(searchParams.get("page")) || 0);
-    const [limit] = useState<number>(Number(searchParams.get("limit")) || 6);
+    const [limit] = useState<number>(Number(searchParams.get("limit")) || 3);
     const [nameInput, setNameInput] = useState<string>(searchParams.get("name") || "");
     const prevPathRef = useRef(location.pathname);
 

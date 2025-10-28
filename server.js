@@ -29,9 +29,9 @@ const ssrBundlePath = path.join(__dirname, 'frontend', 'dist-ssr', 'entry-server
 app.use(express.static(clientDistDir))
 app.use('/uploads', express.static(path.join(process.cwd(), 'app', 'storage', 'uploads')))
 
-app.use('/api', productRoutes)
-app.use('/api', authRoutes)
-app.use('/api', userRoutes)
+productRoutes(app)
+authRoutes(app)
+userRoutes(app)
 
 try {
   const openapiPath = path.join(process.cwd(), 'openapi.yaml')
@@ -48,7 +48,7 @@ try {
   console.warn('Swagger not mounted:', e?.message)
 }
 
-app.get(/^(?!\/api\/|\/products\/|\/uploads\/|\/assets\/|\/favicon\.ico|\/robots\.txt|\/manifest\.json).*/, async (req, res, next) => {
+app.get(/^(?!\/api\/|\/uploads\/|\/assets\/|\/favicon\.ico|\/robots\.txt|\/manifest\.json).*/, async (req, res, next) => {
   try {
     const { render } = await import(ssrBundlePath)
     const fsp = await import('fs/promises')

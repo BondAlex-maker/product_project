@@ -28,7 +28,7 @@ export const fetchCommonProducts = createAsyncThunk(
     async ({ page, limit, name }: FetchProductsArgs, { rejectWithValue }: any): Promise<Product[]> => {
         try {
             const response = await ProductService.getAllCommon(page, limit, name);
-            return response.data.products as Product[];
+            return response.data as Product[];
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || error.message);
         }
@@ -40,7 +40,7 @@ export const fetchAlcoholProducts = createAsyncThunk(
     async ({ page, limit, name }: FetchProductsArgs, { rejectWithValue }: any): Promise<Product[]> => {
         try {
             const response = await ProductService.getAllAlcohol(page, limit, name);
-            return response.data.products as Product[];
+            return response.data;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || error.message);
         }
@@ -52,7 +52,7 @@ export const fetchProductById = createAsyncThunk(
     async (id: number | string, { rejectWithValue }: any): Promise<Product> => {
         try {
             const response = await ProductService.get(id);
-            return response.data as Product;
+            return response.data;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || error.message);
         }
@@ -123,7 +123,9 @@ const productSlice = createSlice({
             })
             .addCase(fetchCommonProducts.fulfilled, (state, action: PayloadAction<Product[]>) => {
                 state.loading = false;
-                state.list = action.payload;
+                state.list = action.payload.products;
+                state.totalPages = action.payload.totalPages;
+                state.currentPage = action.payload.currentPage;
             })
             .addCase(fetchCommonProducts.rejected, (state, action: any) => {
                 state.loading = false;
@@ -135,7 +137,9 @@ const productSlice = createSlice({
             })
             .addCase(fetchAlcoholProducts.fulfilled, (state, action: PayloadAction<Product[]>) => {
                 state.loading = false;
-                state.list = action.payload;
+                state.list = action.payload.products;
+                state.totalPages = action.payload.totalPages;
+                state.currentPage = action.payload.currentPage;
             })
             .addCase(fetchAlcoholProducts.rejected, (state, action: any) => {
                 state.loading = false;
